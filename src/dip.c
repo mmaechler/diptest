@@ -23,11 +23,11 @@
 				===                          ======
 
    dip.f -- translated by f2c (version of 22 July 1992  22:54:52).
-
+   
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
-   			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
-
-   $Id: dip.c,v 1.11 2000/12/12 21:57:27 mm Exp $
+   Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
+   
+   $Id: dip.c,v 1.12 2000/12/12 22:06:15 mm Exp $
 */
 
 #include <R.h>
@@ -43,8 +43,8 @@ void diptst(double *x, Sint *n,
     int low, high,  gcmi, gcmi1, gcmix,  lcm1, lcmiv, lcmiv1, 
 	mnj, mnmnj, mjk, mjmjk,   ic, icv, icva, icx, icxa,
 	ig, ih, iv, ix, j, jb, je, jk, jr, k, kb, ke, kr;
-    double fn, dip_l, dip_u, dipnew, a, b, d, dx, t, temp, C;
-
+    double fn, dip_l, dip_u, dipnew, d, dx, t, temp, C;
+    long a,b;
     int N = *n, N1 = N - 1;
 
     /* Parameter adjustments, so I can do "as with index 1" : x[1]..x[N] */
@@ -87,8 +87,8 @@ void diptst(double *x, Sint *n,
 	while(1) {
 	  mnj = mn[j];
 	  mnmnj = mn[mnj];
-	  a = (double) (mnj - mnmnj);
-	  b = (double) (j - mnj);
+	  a = (long) (mnj - mnmnj);
+	  b = (long) (j - mnj);
 	  if (mnj == 1 ||
 	      (x[j] - x[mnj]) * a < (x[mnj] - x[mnmnj]) * b) break;
 	  mn[j] = mnmnj;
@@ -105,8 +105,8 @@ void diptst(double *x, Sint *n,
 	while(1) {
 	  mjk = mj[k];
 	  mjmjk = mj[mjk];
-	  a = (double) (mjk - mjmjk);
-	  b = (double) (k - mjk);
+	  a = (long) (mjk - mjmjk);
+	  b = (long) (k - mjk);
 	  if (mjk == N ||
 	      (x[k] - x[mjk]) * a < (x[mjk] - x[mjmjk]) * b) break;
 	  mj[k] = mjmjk;
@@ -156,8 +156,8 @@ LOOP_Start:
 	  lcmiv = lcm[iv];
 	  gcmi  = gcm[ix];
 	  gcmi1 = gcm[ix + 1];
-	  a = (double) (lcmiv - gcmi1 + 1);
-	  b = (double) (gcmi - gcmi1);
+	  a = (long) (lcmiv - gcmi1 + 1);
+	  b = (long) (gcmi - gcmi1);
 	  dx = a / fn - (x[lcmiv] - x[gcmi1]) * b / (fn * (x[gcmi] - x[gcmi1]));
 	  ++iv;
 	  if (dx >= d) {
@@ -170,8 +170,8 @@ LOOP_Start:
 	  /*     calculate the distance here. */
 
 	  lcmiv1 = lcm[iv - 1];
-	  a = (double) (lcmiv - lcmiv1);
-	  b = (double) (gcmix - lcmiv1 - 1);
+	  a = (long) (lcmiv - lcmiv1);
+	  b = (long) (gcmix - lcmiv1 - 1);
 	  dx = (x[gcmix] - a* x[lcmiv1]) / (fn*(x[lcmiv] - x[lcmiv1])) - b/fn;
 	  --ix;
 	  if (dx >= d) {
@@ -206,10 +206,10 @@ LOOP_Start:
 	jb = gcm[j + 1];
 	je = gcm[j];
 	if (je - jb > 1 && x[je] != x[jb]) {
-	  a = (double) (je - jb);
+	  a = (long) (je - jb);
 	  C = a / (fn * (x[je] - x[jb]));
 	  for (jr = jb; jr <= je; ++jr) {
-	    b = (double) (jr - jb + 1);
+	    b = (long) (jr - jb + 1);
 	    t = b / fn - (x[jr] - x[jb]) * C;
 	    if (t > temp) { temp = t; }
 	  }
@@ -228,10 +228,10 @@ LOOP_Start:
 	kb = lcm[k];
 	ke = lcm[k + 1];
 	if (ke - kb > 1 && x[ke] != x[kb]) {
-	  a = (double) (ke - kb);
+	  a = (long) (ke - kb);
 	  C = a / (fn * (x[ke] - x[kb]));
 	  for (kr = kb; kr <= ke; ++kr) {
-	    b = (double) (kr - kb - 1);
+	    b = (long) (kr - kb - 1);
 	    t = (x[kr] - x[kb]) * C - b / fn;
 	    if (t > temp) temp = t;
 	  }
