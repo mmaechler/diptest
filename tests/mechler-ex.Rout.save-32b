@@ -1,0 +1,68 @@
+
+R : Copyright 2003, The R Foundation for Statistical Computing
+Version 1.8.1 alpha (2003-10-31), ISBN 3-900051-00-3
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(diptest)
+> ## These are from
+> ## the 217-readme.doc file that explains the bug fixed by
+> ## Ferenc Mechler (fmechler@med.cornell.edu). [5/Sep/2002]
+> ##
+> ex1 <- c(0.0198, 0.0198, 0.1961, 0.2898, 0.3184, 0.3687,
++          0.4336, 0.4987, 0.5661, 0.6530, 0.7476, 0.8555)
+> 
+> ex2 <- c(0.0198, 0.1961, 0.2898, 0.3184, 0.3687, 0.4336,
++          0.4987, 0.5661, 0.6530, 0.7476, 0.8555, 0.9912)
+> 
+> ## Multiply them by 10000 here:
+> 
+> str(dip(10000*ex1, full=TRUE, debug=TRUE), digits = 10, vec.len = 12)
+dip() in C: N = 12; starting with N*dip = 1.
+'dip':LOOP-BEGIN: low, high =     1,   12
+'dip':LOOP-BEGIN: low, high =     4,    9
+List of 12
+ $ x     : num [1:12]  198  198 1961 2898 3184 3687 4336 4987 5661 6530 7476 8555
+ $ n     : int 12
+ $ dip   : num 0.08333333333
+ $ lo.hi : int [1:2] 4 9
+ $ ifault: int 0
+ $ gcm   : int [1:12] 9 4 1 0 0 0 0 0 0 0 0 0
+ $ lcm   : int [1:12] 4 5 6 7 8 9 0 0 0 0 0 0
+ $ mn    : int [1:12] 1 1 1 1 4 4 4 4 4 4 4 4
+ $ mj    : int [1:12] 2 9 6 5 6 7 8 9 10 11 12 12
+ $ debug : logi TRUE
+ $ xl    : num 2898
+ $ xu    : num 5661
+> 
+> str(dip(10000*ex2, full=TRUE, debug=TRUE), digits = 10, vec.len = 12)
+dip() in C: N = 12; starting with N*dip = 1.
+'dip':LOOP-BEGIN: low, high =     1,   12
+'dip':LOOP-BEGIN: low, high =     3,    8
+'dip':LOOP-BEGIN: low, high =     3,    5
+'dip':LOOP-BEGIN: low, high =     3,    4
+No improvement in  low = 3  nor  high = 4 --> END
+List of 12
+ $ x     : num [1:12]  198 1961 2898 3184 3687 4336 4987 5661 6530 7476 8555 9912
+ $ n     : int 12
+ $ dip   : num 0.04166666667
+ $ lo.hi : int [1:2] 3 4
+ $ ifault: int 0
+ $ gcm   : int [1:12] 4 3 2 1 0 0 0 0 0 0 0 0
+ $ lcm   : int [1:12] 3 4 5 6 7 8 0 0 0 0 0 0
+ $ mn    : int [1:12] 1 1 2 3 3 3 3 3 3 3 3 3
+ $ mj    : int [1:12] 8 5 4 5 6 7 8 9 10 11 12 12
+ $ debug : logi TRUE
+ $ xl    : num 2898
+ $ xu    : num 3184
+> 
