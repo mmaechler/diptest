@@ -27,17 +27,12 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.9 1994/07/30 10:51:14 maechler Exp $
+   $Id: dip.c,v 1.10 2000/12/12 21:56:06 mm Exp $
 */
 #include <stdio.h> /*--- for debugging only ---*/
 
 /* Subroutine */ 
-int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj, debug)
-     float *x; long *n;
-     float *dip, *xl, *xu;
-     long *ifault, *gcm, *lcm, *mn, *mj,
-           *debug;
-
+int diptst (float *x, long int *n, float *dip, float *xl, float *xu, long int *ifault, long int *gcm, long int *lcm, long int *mn, long int *mj, long int *debug)
 {
     /* Initialized data */
 
