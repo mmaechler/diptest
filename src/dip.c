@@ -1,6 +1,11 @@
 /* dip.f -- translated by f2c (version 19940714).
    You must link the resulting object file with the libraries:
 	-lF77 -I77 -lm   (in that order)
+
+   Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
+   			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
+
+   $Id$
 */
 
 #include "f2c.h"
@@ -78,7 +83,6 @@ integer *ifault, *gcm, *lcm, *mn, *mj;
 	if (x[k] < x[k - 1]) {
 	    return 0;
 	}
-/* L3: */
     }
 
     *ifault = 0;
@@ -86,8 +90,7 @@ integer *ifault, *gcm, *lcm, *mn, *mj;
 /*     Check for all values of X identical, */
 /*     and for 1 < N < 4. */
 
-    if (x[*n] > x[1] && *n >= 4) {
-	goto L5;
+    if (x[*n] > x[1] && *n >= 4) {	goto L5;
     }
 L4:
     *xl = x[1];
@@ -95,10 +98,9 @@ L4:
     *dip = zero;
     return 0;
 
-/*     LOW contains the index of the current estimate of the lower end */
-/*     of the modal interval, HIGH contains the index for the upper end. 
+/*     LOW contains the index of the current estimate  of the lower end
+       of the modal interval, HIGH contains the index for the upper end. 
 */
-
 L5:
     fn = (real) (*n);
     low = 1;
@@ -108,9 +110,8 @@ L5:
     *xu = x[high];
 
 /*     Establish the indices over which combination is necessary for the 
+       convex minorant fit.
 */
-/*     convex minorant fit. */
-
     mn[1] = 1;
     i__1 = *n;
     for (j = 2; j <= i__1; ++j) {
@@ -130,8 +131,8 @@ L28:
     }
 
 /*     Establish the indices over which combination is necessary for the 
+       concave majorant fit. 
 */
-/*     concave majorant fit. */
 
     mj[*n] = *n;
     na = *n - 1;
@@ -193,16 +194,14 @@ L44:
     ix = icx - 1;
     iv = 2;
     d = zero;
-    if (icx != 2 || icv != 2) {
-	goto L50;
+    if (icx != 2 || icv != 2) {	goto L50;
     }
     d = one / fn;
     goto L65;
 L50:
     igcmx = gcm[ix];
     lcmiv = lcm[iv];
-    if (igcmx > lcmiv) {
-	goto L55;
+    if (igcmx > lcmiv) {	goto L55;
     }
 
 /*     If the next point of either the GCM or LCM is from the LCM, */
@@ -213,8 +212,7 @@ L50:
     b = (real) (igcmx - lcmiv1 - 1);
     dx = (x[igcmx] - x[lcmiv1] * a) / (fn * (x[lcmiv] - x[lcmiv1])) - b / fn;
     --ix;
-    if (dx < d) {
-	goto L60;
+    if (dx < d) {	goto L60;
     }
     d = dx;
     ig = ix + 1;
@@ -232,9 +230,7 @@ L55:
     b = (real) (igcm - igcm1);
     dx = a / fn - (x[lcmiv] - x[igcm1]) * b / (fn * (x[igcm] - x[igcm1]));
     ++iv;
-    if (dx < d) {
-	goto L60;
-    }
+    if (dx < d) {	goto L60;    }
     d = dx;
     ig = ix + 1;
     ih = iv - 1;
@@ -245,34 +241,24 @@ L60:
     if (iv > icv) {
 	iv = icv;
     }
-    if (gcm[ix] != lcm[iv]) {
-	goto L50;
-    }
+    if (gcm[ix] != lcm[iv]) {	goto L50;    }
 L65:
-    if (d < *dip) {
-	goto L100;
-    }
+    if (d < *dip) {	goto L100;    }
 
 /*     Calculate the DIPs for the current LOW and HIGH. */
 
 /*     The DIP for the convex minorant. */
 
     dl = zero;
-    if (ig == icx) {
-	goto L80;
-    }
+    if (ig == icx) {	goto L80;    }
     icxa = icx - 1;
     i__1 = icxa;
     for (j = ig; j <= i__1; ++j) {
 	temp = one / fn;
 	jb = gcm[j + 1];
 	je = gcm[j];
-	if (je - jb <= 1) {
-	    goto L74;
-	}
-	if (x[je] == x[jb]) {
-	    goto L74;
-	}
+	if (je - jb <= 1) {	    goto L74;	}
+	if (x[je] == x[jb]) {	    goto L74;	}
 	a = (real) (je - jb);
 	const_ = a / (fn * (x[je] - x[jb]));
 	i__2 = je;
@@ -282,13 +268,11 @@ L65:
 	    if (t > temp) {
 		temp = t;
 	    }
-/* L72: */
 	}
 L74:
 	if (dl < temp) {
 	    dl = temp;
 	}
-/* L76: */
     }
 
 /*     The DIP for the concave majorant. */
@@ -304,12 +288,8 @@ L80:
 	temp = one / fn;
 	kb = lcm[k];
 	ke = lcm[k + 1];
-	if (ke - kb <= 1) {
-	    goto L86;
-	}
-	if (x[ke] == x[kb]) {
-	    goto L86;
-	}
+	if (ke - kb <= 1) {	    goto L86;	}
+	if (x[ke] == x[kb]) {	    goto L86;	}
 	a = (real) (ke - kb);
 	const_ = a / (fn * (x[ke] - x[kb]));
 	i__2 = ke;
@@ -319,25 +299,19 @@ L80:
 	    if (t > temp) {
 		temp = t;
 	    }
-/* L84: */
 	}
 L86:
 	if (du < temp) {
 	    du = temp;
 	}
-/* L88: */
     }
 
 /*     Determine the current maximum. */
 
 L90:
     dipnew = dl;
-    if (du > dl) {
-	dipnew = du;
-    }
-    if (*dip < dipnew) {
-	*dip = dipnew;
-    }
+    if (du > dl) {	dipnew = du;    }
+    if (*dip < dipnew) { *dip = dipnew;    }
     low = gcm[ig];
     high = lcm[ih];
 
@@ -352,4 +326,3 @@ L100:
 
     return 0;
 } /* diptst_ */
-
