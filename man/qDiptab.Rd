@@ -16,7 +16,13 @@
   A numeric matrix %may change: of dimension 17 * 26,
   where each row corresponds to sample size \eqn{n}, and each column to
   a probability (percentage) in \eqn{[0,1]}.  The dimnames are named
-  \code{n} and \code{Pr} and coercable to these values, see the examples.
+  \code{n} and \code{Pr} and coercable to these values, see the
+  examples.  \code{attr(qDiptab, "N_1")} is \eqn{N - 1}, such that with
+  \code{k <- as.numeric(dimnames(qDiptab)$Pr) * attr(qDiptab, "N_1")},
+  e.g. \code{qDiptab[n == 15,]} contains exactly \eqn{D_
+
+
+
 }
 \seealso{\code{\link{dip}}, also for the references.}
 \author{Martin Maechler \email{maechler@stat.math.ethz.ch}
