@@ -13,8 +13,7 @@ dip <- function(x, full.result = FALSE, debug = FALSE)
           x   = as.double(x),
           n   = n,
           dip = double(1),
-          xl  = double(1),
-          xu  = double(1),
+          lo.hi = integer(2),
           ifault= integer(1),
           gcm =   integer(n),
           lcm =   integer(n),
@@ -25,5 +24,6 @@ dip <- function(x, full.result = FALSE, debug = FALSE)
           PACKAGE = "diptest")[if(full.result) TRUE else "dip"]
   ##-   if(z$ifault)  #-- something not ok, but this is IMPOSSIBLE here
   ##-     stop(paste("Problem -- C 'message' : ifault = ", z$ifault))
-  if(full.result) r else r[[1]]
+  if(full.result) c(r, {u <- x[r$lo.hi]; list(xl = u[1], xu = u[2])})
+  else r[[1]]
 }
