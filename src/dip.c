@@ -27,47 +27,46 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.10 2000/12/12 21:56:06 mm Exp $
+   $Id: dip.c,v 1.11 2000/12/12 21:57:27 mm Exp $
 */
-#include <stdio.h> /*--- for debugging only ---*/
+
+#include <R.h>
 
 /* Subroutine */ 
-int diptst (float *x, long int *n, float *dip, float *xl, float *xu, long int *ifault, long int *gcm, long int *lcm, long int *mn, long int *mj, long int *debug)
+void diptst(double *x, Sint *n, 
+	    double *dip, double *xl, double *xu, 
+	    Sint *ifault, 
+	    Sint *gcm, Sint *lcm, 
+	    Sint *mn, Sint *mj, Sint *debug)
 {
-    /* Initialized data */
-
-    static float zero = (float)0.;
-    static float one  = (float)1.;
-
     /* Local variables */
-    long low, high,  gcmi, gcmi1, gcmix,  lcm1, lcmiv, lcmiv1, 
+    int low, high,  gcmi, gcmi1, gcmix,  lcm1, lcmiv, lcmiv1, 
 	mnj, mnmnj, mjk, mjmjk,   ic, icv, icva, icx, icxa,
-	ig, ih, iv, ix, j, jb, je, jk, jr, k, kb, ke, kr, N1;
-    float fn, dip_l, dip_u, dipnew, a, b, d, dx, t, temp, C;
+	ig, ih, iv, ix, j, jb, je, jk, jr, k, kb, ke, kr;
+    double fn, dip_l, dip_u, dipnew, a, b, d, dx, t, temp, C;
 
-    long N = *n;
+    int N = *n, N1 = N - 1;
 
     /* Parameter adjustments, so I can do "as with index 1" : x[1]..x[N] */
     --mj;    --mn;
     --lcm;   --gcm;
     --x;
-    N1 = N - 1;
 
 /*-------- Function Body ------------------------------ */
 
-    *ifault = 1;    if (N <= 0) { return 0; }
+    *ifault = 1;    if (N <= 0) { return; }
     *ifault = 0;
 
 /* Check that X is sorted --- if not, return with  ifault = 2*/
 
-    *ifault = 2;    for (k = 2; k <= N; ++k) if (x[k] < x[k - 1]) return 0;
+    *ifault = 2;    for (k = 2; k <= N; ++k) if (x[k] < x[k - 1]) return;
     *ifault = 0;
 
 /* Check for all values of X identical, */
 /*     and for 1 <= N < 4. */
 
     if (N < 4 || x[N] == x[1]) {	
-      *xl = x[1];  *xu = x[N];   *dip = zero;      return 0;
+      *xl = x[1];  *xu = x[N];   *dip = 0.;      return;
     }
 
 /* LOW contains the index of the current estimate  of the lower end
@@ -75,10 +74,9 @@ int diptst (float *x, long int *n, float *dip, float *xl, float *xu, long int *i
 */
 
     low = 1;    high = N; /*-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
-    fn = (float) (N);
-    *dip = one / fn;
+    *dip = 1. / N;
 
-    if(*debug) printf( "'dip': starting with dip = %5g\n", *dip);
+    if(*debug) Rprintf( "'dip': starting with dip = %5g\n", *dip);
 
 /* Establish the indices   mn[1..N]  over which combination is necessary
    for the convex MINORANT (GCM) fit.
@@ -89,8 +87,8 @@ int diptst (float *x, long int *n, float *dip, float *xl, float *xu, long int *i
 	while(1) {
 	  mnj = mn[j];
 	  mnmnj = mn[mnj];
-	  a = (float) (mnj - mnmnj);
-	  b = (float) (j - mnj);
+	  a = (double) (mnj - mnmnj);
+	  b = (double) (j - mnj);
 	  if (mnj == 1 ||
 	      (x[j] - x[mnj]) * a < (x[mnj] - x[mnmnj]) * b) break;
 	  mn[j] = mnmnj;
@@ -107,8 +105,8 @@ int diptst (float *x, long int *n, float *dip, float *xl, float *xu, long int *i
 	while(1) {
 	  mjk = mj[k];
 	  mjmjk = mj[mjk];
-	  a = (float) (mjk - mjmjk);
-	  b = (float) (k - mjk);
+	  a = (double) (mjk - mjmjk);
+	  b = (double) (k - mjk);
 	  if (mjk == N ||
 	      (x[k] - x[mjk]) * a < (x[mjk] - x[mjmjk]) * b) break;
 	  mj[k] = mjmjk;
@@ -120,7 +118,7 @@ LOOP_Start:
 
 /* Collect the change points for the GCM from HIGH to LOW. */
 
-    if(*debug) printf( "'dip':LOOP-BEGIN: low, high = %5ld,%5ld\n", low,high);
+    if(*debug) Rprintf( "'dip':LOOP-BEGIN: low, high = %5ld,%5ld\n", low,high);
 
     ic = 1; gcm[1] = high;
     while(gcm[ic] > low) {
@@ -149,7 +147,7 @@ LOOP_Start:
 /*     Find the largest distance greater than 'DIP' between the GCM and */
 /*     the LCM from LOW to HIGH. */
 
-    ix = icx - 1;    iv = 2;    d = zero;
+    ix = icx - 1;    iv = 2;    d = 0.;
     if (icx != 2 || icv != 2) {
       while(1) { /* gcm[ix] != lcm[iv]  (after first loop) */
 	gcmix = gcm[ix];
@@ -158,8 +156,8 @@ LOOP_Start:
 	  lcmiv = lcm[iv];
 	  gcmi  = gcm[ix];
 	  gcmi1 = gcm[ix + 1];
-	  a = (float) (lcmiv - gcmi1 + 1);
-	  b = (float) (gcmi - gcmi1);
+	  a = (double) (lcmiv - gcmi1 + 1);
+	  b = (double) (gcmi - gcmi1);
 	  dx = a / fn - (x[lcmiv] - x[gcmi1]) * b / (fn * (x[gcmi] - x[gcmi1]));
 	  ++iv;
 	  if (dx >= d) {
@@ -172,8 +170,8 @@ LOOP_Start:
 	  /*     calculate the distance here. */
 
 	  lcmiv1 = lcm[iv - 1];
-	  a = (float) (lcmiv - lcmiv1);
-	  b = (float) (gcmix - lcmiv1 - 1);
+	  a = (double) (lcmiv - lcmiv1);
+	  b = (double) (gcmix - lcmiv1 - 1);
 	  dx = (x[gcmix] - a* x[lcmiv1]) / (fn*(x[lcmiv] - x[lcmiv1])) - b/fn;
 	  --ix;
 	  if (dx >= d) {
@@ -191,7 +189,7 @@ LOOP_Start:
 	if (gcm[ix] == lcm[iv]) break;
       }
     } else { /* icx or icv == 2 */
-      d = one / fn;
+      d = 1. / fn;
     }
 
     if (d < *dip)	goto L_END;
@@ -200,18 +198,18 @@ LOOP_Start:
 
     /* The DIP for the convex minorant. */
 
-    dip_l = zero;
+    dip_l = 0.;
     if (ig != icx) {
       icxa = icx - 1;
       for (j = ig; j <= icxa; ++j) {
-	temp = one / fn;
+	temp = 1. / fn;
 	jb = gcm[j + 1];
 	je = gcm[j];
 	if (je - jb > 1 && x[je] != x[jb]) {
-	  a = (float) (je - jb);
+	  a = (double) (je - jb);
 	  C = a / (fn * (x[je] - x[jb]));
 	  for (jr = jb; jr <= je; ++jr) {
-	    b = (float) (jr - jb + 1);
+	    b = (double) (jr - jb + 1);
 	    t = b / fn - (x[jr] - x[jb]) * C;
 	    if (t > temp) { temp = t; }
 	  }
@@ -222,18 +220,18 @@ LOOP_Start:
 
     /* The DIP for the concave majorant. */
 
-    dip_u = zero;
+    dip_u = 0.;
     if (ih != icv) {
       icva = icv - 1;
       for (k = ih; k <= icva; ++k) {
-	temp = one / fn;
+	temp = 1. / fn;
 	kb = lcm[k];
 	ke = lcm[k + 1];
 	if (ke - kb > 1 && x[ke] != x[kb]) {
-	  a = (float) (ke - kb);
+	  a = (double) (ke - kb);
 	  C = a / (fn * (x[ke] - x[kb]));
 	  for (kr = kb; kr <= ke; ++kr) {
-	    b = (float) (kr - kb - 1);
+	    b = (double) (kr - kb - 1);
 	    t = (x[kr] - x[kb]) * C - b / fn;
 	    if (t > temp) temp = t;
 	  }
@@ -251,7 +249,7 @@ LOOP_Start:
       --- Martin Maechler, Statistics, ETH Zurich, July 30 1994 ---------- */
     if (low == gcm[ig] && high == lcm[ih]) {
       if(*debug) 
-	printf("No improvement in  low = %ld  nor  high = %ld --> END\n",
+	Rprintf("No improvement in  low = %ld  nor  high = %ld --> END\n",
 	       low, high);
     } else {
       low  = gcm[ig];
@@ -260,5 +258,7 @@ LOOP_Start:
 /*---------------------------------------------------------------------------*/
 
 L_END:
-    *xl = x[low];  *xu = x[high];  *dip = (float)0.5 * *dip;    return 0;
+    *xl = x[low];  *xu = x[high];  
+    *dip /= 2;    
+    return;
 } /* diptst */
