@@ -23,27 +23,19 @@
 				===                          ======
 
    dip.f -- translated by f2c (version of 22 July 1992  22:54:52).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
 
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.5 1994/07/29 08:28:16 maechler Exp $
+   $Id: dip.c,v 1.6 1994/07/29 09:20:24 maechler Exp $
 */
 
-/*---- this is OLD  K&R C -- can use 'cc' --> no problem with S-plus 3.2
 /* Subroutine */ 
 int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
      float *x; long *n;
      float *dip, *xl, *xu;
      long *ifault, *gcm, *lcm, *mn, *mj;
 
-/*--- This would be ANSI : --
-/* int diptst (float *x, long *n, float *dip, 
-/* 	    float *xl, float *xu, long *ifault, 
-/* 	    long *gcm, long *lcm, long *mn, long *mj)
- */
 {
     /* Initialized data */
 
@@ -73,10 +65,8 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
     long N = *n;
 
     /* Parameter adjustments, so I can do "as with index 1 : x[1]..x[N] */
-    --mj;
-    --mn;
-    --lcm;
-    --gcm;
+    --mj;    --mn;
+    --lcm;   --gcm;
     --x;
 
 /*-------- Function Body ------------------------------ */
@@ -100,10 +90,9 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
        of the modal interval, HIGH contains the index for the upper end. 
 */
 
-    low = 1;    high = N;
+    low = 1;    high = N; /*-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
     fn = (float) (N);
     *dip = one / fn;
-    /**-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
 
 /*     Establish the indices over which combination is necessary for the 
        convex MINORANT fit.
@@ -223,7 +212,7 @@ LOOP_Start:
 
 /*     Calculate the DIPs for the current LOW and HIGH. */
 
-/*     The DIP for the convex minorant. */
+    /* The DIP for the convex minorant. */
 
     dl = zero;
     if (ig != icx) {
@@ -241,12 +230,11 @@ LOOP_Start:
 	    if (t > temp) { temp = t; }
 	  }
 	}
-
-	if (dl < temp) { dl = temp; }
+	if (dl < temp) dl = temp;
       }
     }
 
-/*     The DIP for the concave majorant. */
+    /* The DIP for the concave majorant. */
 
     du = zero;
     if (ih != icv) {
@@ -264,7 +252,7 @@ LOOP_Start:
 	    if (t > temp) { temp = t; }
 	  }
 	}
-	if (du < temp) { du = temp; }
+	if (du < temp) du = temp;
       }
     }
 
@@ -277,12 +265,12 @@ LOOP_Start:
     high = lcm[ih];
 
     goto LOOP_Start; /* Recycle */
-/* ---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*/
 
 L_END:
-    *dip = half * *dip;
-    *xl = x[low];
-    *xu = x[high];
+    *xl = x[low];  *xu = x[high];  *dip = half * *dip;
 
     return 0;
 } /* diptst */
+
+
