@@ -16,7 +16,7 @@ dip(x, full.result=FALSE, debug=FALSE)
     (from the C routine).}
 }
 \value{
-  depending on \code{full.result} either, a number, the dip statistic or
+  depending on \code{full.result} either a number, the dip statistic, or
   a list with components
   \item{dip}{the dip statistic}
   \item{xl}{lower end of modal interval}
@@ -25,6 +25,10 @@ dip(x, full.result=FALSE, debug=FALSE)
   ...
 
   ...
+}
+\note{
+  For \eqn{n \le 3}{n <= 3} where \code{n <- length(x)}, the dip
+  statistic is always zero, i.e., there's no possible dip test.
 }
 \references{
   P. M. Hartigan (1985)
@@ -40,11 +44,11 @@ dip(x, full.result=FALSE, debug=FALSE)
 }
 \seealso{\code{\link{isoreg}} for isotonic regression.}
 \examples{
-data(exHartigan)
-plot(density(exHartigan))
-dip(exHartigan)
+data(statfaculty)
+plot(density(statfaculty))
+dip(statfaculty)
 
-str(dip(exHartigan, full = TRUE, debug = TRUE))
+str(dip(statfaculty, full = TRUE, debug = TRUE))
 
 data(faithful)
 fE <- faithful$eruptions
