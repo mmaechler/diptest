@@ -27,7 +27,7 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
    
-   $Id: dip.c,v 1.12 2000/12/12 22:06:15 mm Exp $
+   $Id: dip.c,v 1.13 2000/12/12 22:27:42 mm Exp $
 */
 
 #include <R.h>
@@ -43,9 +43,9 @@ void diptst(double *x, Sint *n,
     int low, high,  gcmi, gcmi1, gcmix,  lcm1, lcmiv, lcmiv1, 
 	mnj, mnmnj, mjk, mjmjk,   ic, icv, icva, icx, icxa,
 	ig, ih, iv, ix, j, jb, je, jk, jr, k, kb, ke, kr;
-    double fn, dip_l, dip_u, dipnew, d, dx, t, temp, C;
-    long a,b;
+    double dip_l, dip_u, dipnew, d, dx, t, temp, C;
     int N = *n, N1 = N - 1;
+    double fN = (double)N;
 
     /* Parameter adjustments, so I can do "as with index 1" : x[1]..x[N] */
     --mj;    --mn;
@@ -76,7 +76,7 @@ void diptst(double *x, Sint *n,
     low = 1;    high = N; /*-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
     *dip = 1. / N;
 
-    if(*debug) Rprintf( "'dip': starting with dip = %5g\n", *dip);
+    if(*debug) Rprintf("'dip': starting with dip = %5g\n", *dip);
 
 /* Establish the indices   mn[1..N]  over which combination is necessary
    for the convex MINORANT (GCM) fit.
@@ -87,10 +87,9 @@ void diptst(double *x, Sint *n,
 	while(1) {
 	  mnj = mn[j];
 	  mnmnj = mn[mnj];
-	  a = (long) (mnj - mnmnj);
-	  b = (long) (j - mnj);
 	  if (mnj == 1 ||
-	      (x[j] - x[mnj]) * a < (x[mnj] - x[mnmnj]) * b) break;
+	      ( x[j]  - x[mnj]) * (mnj - mnmnj) < 
+	      (x[mnj] - x[mnmnj]) * (j - mnj)) break;
 	  mn[j] = mnmnj;
 	}
     }
@@ -105,10 +104,9 @@ void diptst(double *x, Sint *n,
 	while(1) {
 	  mjk = mj[k];
 	  mjmjk = mj[mjk];
-	  a = (long) (mjk - mjmjk);
-	  b = (long) (k - mjk);
 	  if (mjk == N ||
-	      (x[k] - x[mjk]) * a < (x[mjk] - x[mjmjk]) * b) break;
+	      ( x[k]  - x[mjk]) * (mjk - mjmjk) < 
+	      (x[mjk] - x[mjmjk]) * (k - mjk)) break;
 	  mj[k] = mjmjk;
 	}
     }
@@ -156,9 +154,8 @@ LOOP_Start:
 	  lcmiv = lcm[iv];
 	  gcmi  = gcm[ix];
 	  gcmi1 = gcm[ix + 1];
-	  a = (long) (lcmiv - gcmi1 + 1);
-	  b = (long) (gcmi - gcmi1);
-	  dx = a / fn - (x[lcmiv] - x[gcmi1]) * b / (fn * (x[gcmi] - x[gcmi1]));
+	  dx = (lcmiv - gcmi1 + 1) / fN - 
+	    (x[lcmiv] - x[gcmi1]) * (gcmi - gcmi1) / (N * (x[gcmi] - x[gcmi1]));
 	  ++iv;
 	  if (dx >= d) {
 	    d = dx;
@@ -170,9 +167,8 @@ LOOP_Start:
 	  /*     calculate the distance here. */
 
 	  lcmiv1 = lcm[iv - 1];
-	  a = (long) (lcmiv - lcmiv1);
-	  b = (long) (gcmix - lcmiv1 - 1);
-	  dx = (x[gcmix] - a* x[lcmiv1]) / (fn*(x[lcmiv] - x[lcmiv1])) - b/fn;
+	  dx = (x[gcmix] - (lcmiv - lcmiv1)* x[lcmiv1]) / 
+	    (N*(x[lcmiv] - x[lcmiv1])) - (gcmix - lcmiv1 - 1) / fN;
 	  --ix;
 	  if (dx >= d) {
 	    d = dx;
@@ -189,7 +185,7 @@ LOOP_Start:
 	if (gcm[ix] == lcm[iv]) break;
       }
     } else { /* icx or icv == 2 */
-      d = 1. / fn;
+      d = 1. / fN;
     }
 
     if (d < *dip)	goto L_END;
@@ -202,15 +198,13 @@ LOOP_Start:
     if (ig != icx) {
       icxa = icx - 1;
       for (j = ig; j <= icxa; ++j) {
-	temp = 1. / fn;
+	temp = 1. / fN;
 	jb = gcm[j + 1];
 	je = gcm[j];
 	if (je - jb > 1 && x[je] != x[jb]) {
-	  a = (long) (je - jb);
-	  C = a / (fn * (x[je] - x[jb]));
+	  C = (je - jb) / (fN * (x[je] - x[jb]));
 	  for (jr = jb; jr <= je; ++jr) {
-	    b = (long) (jr - jb + 1);
-	    t = b / fn - (x[jr] - x[jb]) * C;
+	    t = (jr - jb + 1) / fN - (x[jr] - x[jb]) * C;
 	    if (t > temp) { temp = t; }
 	  }
 	}
@@ -224,15 +218,13 @@ LOOP_Start:
     if (ih != icv) {
       icva = icv - 1;
       for (k = ih; k <= icva; ++k) {
-	temp = 1. / fn;
+	temp = 1. / fN;
 	kb = lcm[k];
 	ke = lcm[k + 1];
 	if (ke - kb > 1 && x[ke] != x[kb]) {
-	  a = (long) (ke - kb);
-	  C = a / (fn * (x[ke] - x[kb]));
+	  C = (ke - kb) / (fN * (x[ke] - x[kb]));
 	  for (kr = kb; kr <= ke; ++kr) {
-	    b = (long) (kr - kb - 1);
-	    t = (x[kr] - x[kb]) * C - b / fn;
+	    t = (x[kr] - x[kb]) * C - (kr - kb - 1) / fN;
 	    if (t > temp) temp = t;
 	  }
 	}
