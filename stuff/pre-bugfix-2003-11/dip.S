@@ -3,7 +3,7 @@
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
-###-- $Id: dip.S,v 1.2 1994/07/29 08:36:23 maechler Exp $
+###-- $Id: dip.S,v 1.3 1994/07/29 08:48:30 maechler Exp $
 
 hartigan.data <- scan()
  30 33 35 36 37 37 39 39 39 39 39 40 40 40 40 41 42 43 43 43 44 44 45 45 46
@@ -39,6 +39,9 @@ dip <- function(x, full.result = FALSE)
   ##-     stop(paste("Problem -- C 'message' : ifault = ", z$ifault))
 }
 
+dip(hstart)## 0.03998769
+dip(ship)  ## 0.02328392
+dip(iris)  ## 0.02874999
 dip(hartigan.data) ## Should give   0.05952381
 str(dip.hh <- dip(hartigan.data, full = T))
 
@@ -46,7 +49,7 @@ str(dip.hh <- dip(hartigan.data, full = T))
 
 dip.1.10_rep(0,100)
 unix.time(for(i in 1:100) dip.1.10[i] <- dip(jitter(1:10)))
-##--> 2.3666 CPU sec. on Sparstation 10 (ingrid)
+##--> 2.3 CPU sec. on Sparstation 10 (ingrid)
 summary(dip.1.10)
 ##-  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##-  0.05 0.05757 0.06016 0.05979 0.06237 0.06686
@@ -104,3 +107,10 @@ dipF <- function(x)
 }
 dipF(hartigan.data) ##-> [1] 0.05952381
 
+### Test if  dip.c  is still okay, after all my hacking at the code
+###                 (dipF.f  which is used by dipF(..) is ORIGINAL !)
+
+for(i in 1:100){x_runif(50); if(dip(x) != dipF(x)) { xx<<-x; stop("DIFFERENT")}}
+for(i in 1:100) { 
+  x_c(rnorm(100), 5+ rnorm(20))
+  if(dip(x) != dipF(x)) { xx<<-x; stop("DIFFERENT") } }
