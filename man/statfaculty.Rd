@@ -17,7 +17,7 @@ data(statfaculty)
   The Dip Test of Unimodality;
   \emph{Annals of Statistics} \bold{13}, 70--84.
 }
-\source
+\source{
   M. G. Scully (1982)
   Evaluation of 596 programs in mathematics and physical sciences;
   \emph{Chronicle Higher Educ.} \bold{25} 5, 8--10.
