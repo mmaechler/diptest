@@ -27,7 +27,7 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.8 1994/07/29 10:00:15 maechler Exp $
+   $Id: dip.c,v 1.9 1994/07/30 10:51:14 maechler Exp $
 */
 #include <stdio.h> /*--- for debugging only ---*/
 
@@ -255,7 +255,7 @@ LOOP_Start:
     /*--- The following 'if' is NECESSARY ! ------------------------------
       --- Martin Maechler, Statistics, ETH Zurich, July 30 1994 ---------- */
     if (low == gcm[ig] && high == lcm[ih]) {
-      if(debug) 
+      if(*debug) 
 	printf("No improvement in  low = %ld  nor  high = %ld --> END\n",
 	       low, high);
     } else {
