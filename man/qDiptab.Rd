@@ -19,10 +19,9 @@
   \code{n} and \code{Pr} and coercable to these values, see the
   examples.  \code{attr(qDiptab, "N_1")} is \eqn{N - 1}, such that with
   \code{k <- as.numeric(dimnames(qDiptab)$Pr) * attr(qDiptab, "N_1")},
-  e.g. \code{qDiptab[n == 15,]} contains exactly \eqn{D_
-
-
-
+  e.g., \code{qDiptab[n == 15,]} contains exactly the order statistics
+  \eqn{D_{[k]}} (from the \eqn{N+1} simulated values of
+  \code{\link{dip(U)}}, where \code{U <- runif(15)}.
 }
 \seealso{\code{\link{dip}}, also for the references.}
 \author{Martin Maechler \email{maechler@stat.math.ethz.ch}
