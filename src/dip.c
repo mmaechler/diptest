@@ -27,7 +27,7 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.6 1994/07/29 09:20:24 maechler Exp $
+   $Id: dip.c,v 1.7 1994/07/29 09:29:57 maechler Exp $
 */
 
 /* Subroutine */ 
@@ -41,26 +41,13 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
 
     static float zero = (float)0.;
     static float half = (float).5;
-    static float one = (float)1.;
+    static float one  = (float)1.;
 
     /* Local variables */
-    static long high, igcm, icva, icxa;
-    static float temp;
-    static long igcm1;
-    static float a, b, d;
-    static long j, k;
-    static float t;
-    static long igcmx, mjmjk, lcmiv, mnmnj;
-    static float const__;
-    static long lcmiv1, ic, jb, kb, na, ig, ih;
-    static float dl;
-    static long je;
-    static float fn;
-    static long jk, ke;
-    static float du, dx;
-    static long jr, kr, iv, ix;
-    static float dipnew;
-    static long mjk, icx, mnj, icv, low, lcm1;
+    long low, high,  gcmi, gcmi1, gcmix,  lcm1, lcmiv, lcmiv1, 
+	mnj, mnmnj, mjk, mjmjk,   ic, icv, icva, icx, icxa,
+	ig, ih, iv, ix, j, jb, je, jk, jr, k, kb, ke, kr, N1;
+    float fn, dip_l, dip_u, dipnew, a, b, d, dx, t, temp, C;
 
     long N = *n;
 
@@ -68,6 +55,7 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
     --mj;    --mn;
     --lcm;   --gcm;
     --x;
+    N1 = N - 1;
 
 /*-------- Function Body ------------------------------ */
 
@@ -116,8 +104,7 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
 */
 
     mj[N] = N;
-    na = N - 1;
-    for (jk = 1; jk <= na; ++jk) {
+    for (jk = 1; jk <= N1; ++jk) {
 	k = N - jk;
 	mj[k] = k + 1;
 	while(1) {
@@ -138,9 +125,9 @@ LOOP_Start:
 
     ic = 1; gcm[1] = high;
     while(gcm[ic] > low) {
-      igcm1 = gcm[ic];
+      gcmi1 = gcm[ic];
       ++ic;
-      gcm[ic] = mn[igcm1];
+      gcm[ic] = mn[gcmi1];
     }
     icx = ic;
 
@@ -154,7 +141,7 @@ LOOP_Start:
     }
     icv = ic;
 
-/*     ICX, IX, IG are counters for the convex minorant, */
+/*     ICX, IX, IG are counters for the convex  minorant, */
 /*     ICV, IV, IH are counters for the concave majorant. */
 
     ig = icx;
@@ -165,16 +152,16 @@ LOOP_Start:
 
     ix = icx - 1;    iv = 2;    d = zero;
     if (icx != 2 || icv != 2) {
-      while(1) {
-	igcmx = gcm[ix];
+      while(1) { /* gcm[ix] != lcm[iv]  (after first loop) */
+	gcmix = gcm[ix];
 	lcmiv = lcm[iv];
-	if (igcmx > lcmiv) {	
+	if (gcmix > lcmiv) {	
 	  lcmiv = lcm[iv];
-	  igcm = gcm[ix];
-	  igcm1 = gcm[ix + 1];
-	  a = (float) (lcmiv - igcm1 + 1);
-	  b = (float) (igcm - igcm1);
-	  dx = a / fn - (x[lcmiv] - x[igcm1]) * b / (fn * (x[igcm] - x[igcm1]));
+	  gcmi  = gcm[ix];
+	  gcmi1 = gcm[ix + 1];
+	  a = (float) (lcmiv - gcmi1 + 1);
+	  b = (float) (gcmi - gcmi1);
+	  dx = a / fn - (x[lcmiv] - x[gcmi1]) * b / (fn * (x[gcmi] - x[gcmi1]));
 	  ++iv;
 	  if (dx >= d) {
 	    d = dx;
@@ -187,8 +174,8 @@ LOOP_Start:
 
 	  lcmiv1 = lcm[iv - 1];
 	  a = (float) (lcmiv - lcmiv1);
-	  b = (float) (igcmx - lcmiv1 - 1);
-	  dx = (x[igcmx] - a* x[lcmiv1]) / (fn*(x[lcmiv] - x[lcmiv1])) - b/fn;
+	  b = (float) (gcmix - lcmiv1 - 1);
+	  dx = (x[gcmix] - a* x[lcmiv1]) / (fn*(x[lcmiv] - x[lcmiv1])) - b/fn;
 	  --ix;
 	  if (dx >= d) {
 	    d = dx;
@@ -214,7 +201,7 @@ LOOP_Start:
 
     /* The DIP for the convex minorant. */
 
-    dl = zero;
+    dip_l = zero;
     if (ig != icx) {
       icxa = icx - 1;
       for (j = ig; j <= icxa; ++j) {
@@ -223,20 +210,20 @@ LOOP_Start:
 	je = gcm[j];
 	if (je - jb > 1 && x[je] != x[jb]) {
 	  a = (float) (je - jb);
-	  const__ = a / (fn * (x[je] - x[jb]));
+	  C = a / (fn * (x[je] - x[jb]));
 	  for (jr = jb; jr <= je; ++jr) {
 	    b = (float) (jr - jb + 1);
-	    t = b / fn - (x[jr] - x[jb]) * const__;
+	    t = b / fn - (x[jr] - x[jb]) * C;
 	    if (t > temp) { temp = t; }
 	  }
 	}
-	if (dl < temp) dl = temp;
+	if (dip_l < temp) dip_l = temp;
       }
     }
 
     /* The DIP for the concave majorant. */
 
-    du = zero;
+    dip_u = zero;
     if (ih != icv) {
       icva = icv - 1;
       for (k = ih; k <= icva; ++k) {
@@ -245,32 +232,28 @@ LOOP_Start:
 	ke = lcm[k + 1];
 	if (ke - kb > 1 && x[ke] != x[kb]) {
 	  a = (float) (ke - kb);
-	  const__ = a / (fn * (x[ke] - x[kb]));
+	  C = a / (fn * (x[ke] - x[kb]));
 	  for (kr = kb; kr <= ke; ++kr) {
 	    b = (float) (kr - kb - 1);
-	    t = (x[kr] - x[kb]) * const__ - b / fn;
-	    if (t > temp) { temp = t; }
+	    t = (x[kr] - x[kb]) * C - b / fn;
+	    if (t > temp) temp = t;
 	  }
 	}
-	if (du < temp) du = temp;
+	if (dip_u < temp) dip_u = temp;
       }
     }
 
-/*     Determine the current maximum. */
+    /* Determine the current maximum. */
 
-    dipnew = dl;
-    if (du > dl) {	dipnew = du;    }
-    if (*dip < dipnew) { *dip = dipnew;    }
-    low = gcm[ig];
+    dipnew = dip_l;
+    if (dip_u > dip_l) dipnew = dip_u;
+    if (*dip < dipnew)   *dip = dipnew;
+    low  = gcm[ig];
     high = lcm[ih];
 
     goto LOOP_Start; /* Recycle */
 /*---------------------------------------------------------------------------*/
 
 L_END:
-    *xl = x[low];  *xu = x[high];  *dip = half * *dip;
-
-    return 0;
+    *xl = x[low];  *xu = x[high];  *dip = half * *dip;    return 0;
 } /* diptst */
-
-
