@@ -29,7 +29,7 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.4 1994/07/28 15:18:46 maechler Exp $
+   $Id: dip.c,v 1.5 1994/07/29 08:28:16 maechler Exp $
 */
 
 /*---- this is OLD  K&R C -- can use 'cc' --> no problem with S-plus 3.2
@@ -93,9 +93,7 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
 /*     and for 1 <= N < 4. */
 
     if (N < 4 || x[N] == x[1]) {	
-      *xl = x[1];
-      *xu = x[N];
-      *dip = zero;      return 0;
+      *xl = x[1];  *xu = x[N];   *dip = zero;      return 0;
     }
 
 /*     LOW contains the index of the current estimate  of the lower end
@@ -113,18 +111,15 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
     mn[1] = 1;
     for (j = 2; j <= N; ++j) {
 	mn[j] = j - 1;
-L25:
-	mnj = mn[j];
-	mnmnj = mn[mnj];
-	a = (float) (mnj - mnmnj);
-	b = (float) (j - mnj);
-	if (mnj == 1 || (x[j] - x[mnj]) * a < (x[mnj] - x[mnmnj]) * b) {
-	    goto L28;
+	while(1) {
+	  mnj = mn[j];
+	  mnmnj = mn[mnj];
+	  a = (float) (mnj - mnmnj);
+	  b = (float) (j - mnj);
+	  if (mnj == 1 ||
+	      (x[j] - x[mnj]) * a < (x[mnj] - x[mnmnj]) * b) break;
+	  mn[j] = mnmnj;
 	}
-	mn[j] = mnmnj;
-	goto L25;
-L28:
-	;
     }
 
 /*     Establish the indices over which combination is necessary for the 
@@ -136,44 +131,38 @@ L28:
     for (jk = 1; jk <= na; ++jk) {
 	k = N - jk;
 	mj[k] = k + 1;
-L32:
-	mjk = mj[k];
-	mjmjk = mj[mjk];
-	a = (float) (mjk - mjmjk);
-	b = (float) (k - mjk);
-	if (mjk == N || (x[k] - x[mjk]) * a < (x[mjk] - x[mjmjk]) * b) {
-	    goto L34;
+	while(1) {
+	  mjk = mj[k];
+	  mjmjk = mj[mjk];
+	  a = (float) (mjk - mjmjk);
+	  b = (float) (k - mjk);
+	  if (mjk == N ||
+	      (x[k] - x[mjk]) * a < (x[mjk] - x[mjmjk]) * b) break;
+	  mj[k] = mjmjk;
 	}
-	mj[k] = mjmjk;
-	goto L32;
-L34:
-	;
     }
 
 /* ----------------------- Start the cycling. ------------------------------- */
-/*     Collect the change points for the GCM from HIGH to LOW. */
-
 LOOP_Start:
-    ic = 1;
-    gcm[1] = high;
 
-    while(1) {
+/* Collect the change points for the GCM from HIGH to LOW. */
+
+    ic = 1; gcm[1] = high;
+    while(gcm[ic] > low) {
       igcm1 = gcm[ic];
       ++ic;
       gcm[ic] = mn[igcm1];
-      if (gcm[ic] <= low) {	exit;    }
     }
     icx = ic;
 
-/*     Collect the change points for the LCM from LOW to HIGH. */
+/* Collect the change points for the LCM from LOW to HIGH. */
 
-    ic = 1;
-    lcm[1] = low;
-L44:
-    lcm1 = lcm[ic];
-    ++ic;
-    lcm[ic] = mj[lcm1];
-    if (lcm[ic] < high) {	goto L44;    }
+    ic = 1; lcm[1] = low;
+    while(lcm[ic] < high) {
+      lcm1 = lcm[ic];
+      ++ic;
+      lcm[ic] = mj[lcm1];
+    }
     icv = ic;
 
 /*     ICX, IX, IG are counters for the convex minorant, */
@@ -186,53 +175,51 @@ L44:
 /*     the LCM from LOW to HIGH. */
 
     ix = icx - 1;    iv = 2;    d = zero;
-    if (icx != 2 || icv != 2) {	goto L50;    }
-    d = one / fn;
-    goto L65;
-L50:
-    igcmx = gcm[ix];
-    lcmiv = lcm[iv];
-    if (igcmx > lcmiv) {	goto L55;    }
+    if (icx != 2 || icv != 2) {
+      while(1) {
+	igcmx = gcm[ix];
+	lcmiv = lcm[iv];
+	if (igcmx > lcmiv) {	
+	  lcmiv = lcm[iv];
+	  igcm = gcm[ix];
+	  igcm1 = gcm[ix + 1];
+	  a = (float) (lcmiv - igcm1 + 1);
+	  b = (float) (igcm - igcm1);
+	  dx = a / fn - (x[lcmiv] - x[igcm1]) * b / (fn * (x[igcm] - x[igcm1]));
+	  ++iv;
+	  if (dx >= d) {
+	    d = dx;
+	    ig = ix + 1;
+	    ih = iv - 1;
+	  }
+	} else {
+	  /*     If the next point of either the GCM or LCM is from the LCM, */
+	  /*     calculate the distance here. */
 
-/*     If the next point of either the GCM or LCM is from the LCM, */
-/*     calculate the distance here. */
+	  lcmiv1 = lcm[iv - 1];
+	  a = (float) (lcmiv - lcmiv1);
+	  b = (float) (igcmx - lcmiv1 - 1);
+	  dx = (x[igcmx] - a* x[lcmiv1]) / (fn*(x[lcmiv] - x[lcmiv1])) - b/fn;
+	  --ix;
+	  if (dx >= d) {
+	    d = dx;
+	    ig = ix + 1;
+	    ih = iv;
+	  }
+	}
 
-    lcmiv1 = lcm[iv - 1];
-    a = (float) (lcmiv - lcmiv1);
-    b = (float) (igcmx - lcmiv1 - 1);
-    dx = (x[igcmx] - x[lcmiv1] * a) / (fn * (x[lcmiv] - x[lcmiv1])) - b / fn;
-    --ix;
-    if (dx < d) {	goto L60;    }
-    d = dx;
-    ig = ix + 1;
-    ih = iv;
-    goto L60;
+	/*     If the next point of either the GCM or LCM is from the GCM, */
+	/*     calculate the distance here. */
 
-/*     If the next point of either the GCM or LCM is from the GCM, */
-/*     calculate the distance here. */
-
-L55:
-    lcmiv = lcm[iv];
-    igcm = gcm[ix];
-    igcm1 = gcm[ix + 1];
-    a = (float) (lcmiv - igcm1 + 1);
-    b = (float) (igcm - igcm1);
-    dx = a / fn - (x[lcmiv] - x[igcm1]) * b / (fn * (x[igcm] - x[igcm1]));
-    ++iv;
-    if (dx < d) {	goto L60;    }
-    d = dx;
-    ig = ix + 1;
-    ih = iv - 1;
-L60:
-    if (ix < 1) {
-	ix = 1;
+	if (ix < 1)		ix = 1;
+	if (iv > icv)	iv = icv;
+	if (gcm[ix] == lcm[iv]) break;
+      }
+    } else { /* icx or icv == 2 */
+      d = one / fn;
     }
-    if (iv > icv) {
-	iv = icv;
-    }
-    if (gcm[ix] != lcm[iv]) {	goto L50;    }
-L65:
-    if (d < *dip) {	goto L_END;    }
+
+    if (d < *dip)	goto L_END;
 
 /*     Calculate the DIPs for the current LOW and HIGH. */
 
