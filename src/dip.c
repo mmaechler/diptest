@@ -29,7 +29,7 @@
       ETH Seminar fuer Statistik
       8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.14 2000/12/12 23:02:21 mm Exp $
+   $Id: dip.c,v 1.15 2003/07/14 08:48:42 maechler Exp $
 */
 
 #include <R.h>
@@ -42,7 +42,7 @@ void diptst(double *x, Sint *n,
 	    Sint *mn, Sint *mj, Sint *debug)
 {
     /* Local variables */
-    int low, high,  gcmi, gcmi1, gcmix,	 lcm1, lcmiv, lcmiv1,
+    int low, high, gcmi1, gcmix,  lcmiv, lcmiv1,
 	mnj, mnmnj, mjk, mjmjk,	  ic, icv, icva, icx, icxa,
 	ig, ih, iv, ix, j, jb, je, jk, jr, k, kb, ke, kr;
     double dip_l, dip_u, dipnew, d, dx, t, temp, C;
@@ -116,73 +116,63 @@ void diptst(double *x, Sint *n,
 /* ----------------------- Start the cycling. ------------------------------- */
 LOOP_Start:
 
-/* Collect the change points for the GCM from HIGH to LOW. */
-
     if(*debug) Rprintf( "'dip':LOOP-BEGIN: low, high = %5ld,%5ld\n", low,high);
 
-    ic = 1; gcm[1] = high;
-    while(gcm[ic] > low) {
-      gcmi1 = gcm[ic];
-      gcm[++ic] = mn[gcmi1];
-    }
+/* Collect the change points for the GCM from HIGH to LOW. */
+
+    gcm[1] = high;
+    for(ic = 1; gcm[ic] > low; ic++)
+	gcm[ic+1] = mn[gcm[ic]];
     icx = ic;
 
 /* Collect the change points for the LCM from LOW to HIGH. */
 
-    ic = 1; lcm[1] = low;
-    while(lcm[ic] < high) {
-      lcm1 = lcm[ic];
-      lcm[++ic] = mj[lcm1];
-    }
+    lcm[1] = low;
+    for(ic = 1; lcm[ic] < high; ic++)
+	lcm[ic+1] = mj[lcm[ic]];
     icv = ic;
 
-    /* ICX, IX, IG are counters for the convex	minorant, */
-    /* ICV, IV, IH are counters for the concave majorant. */
+    ig = icx; /* ICX, IX, IG are counters for the convex minorant, */
+    ih = icv; /* ICV, IV, IH are counters for the concave majorant. */
+    ix = icx - 1;    iv = 2;
 
-    ig = icx;
-    ih = icv;
+/*	Find the largest distance greater than 'DIP' between the GCM and
+ *	the LCM from LOW to HIGH. */
 
-/*     Find the largest distance greater than 'DIP' between the GCM and */
-/*     the LCM from LOW to HIGH. */
-
-    ix = icx - 1;    iv = 2;	d = 0.;
+    d = 0.;
     if (icx != 2 || icv != 2) {
       do { /* gcm[ix] != lcm[iv]  (after first loop) */
-	gcmix = gcm[ix];
-	lcmiv = lcm[iv];
-	if (gcmix > lcmiv) {
+	  gcmix = gcm[ix];
 	  lcmiv = lcm[iv];
-	  gcmi	= gcm[ix];
-	  gcmi1 = gcm[ix + 1];
-	  dx = (lcmiv - gcmi1 + 1) / fN -
-	    (x[lcmiv] - x[gcmi1]) * (gcmi - gcmi1) / (N * (x[gcmi] - x[gcmi1]));
-	  ++iv;
-	  if (dx >= d) {
-	    d = dx;
-	    ig = ix + 1;
-	    ih = iv - 1;
+	  if (gcmix > lcmiv) {
+	      /* If the next point of either the GCM or LCM is from the LCM,
+	       * calculate the distance here. */
+	      gcmi1 = gcm[ix + 1];
+	      dx = (lcmiv - gcmi1 + 1) / fN -
+		  (x[lcmiv] - x[gcmi1]) * (gcmix-gcmi1)/(N*(x[gcmix] - x[gcmi1]));
+	      ++iv;
+	      if (dx >= d) {
+		  d = dx;
+		  ig = ix + 1;
+		  ih = iv - 1;
+	      }
 	  }
-	}
-	else {
-	  /*	 If the next point of either the GCM or LCM is from the LCM, */
-	  /*	 calculate the distance here. */
-
-	  lcmiv1 = lcm[iv - 1];
-	  dx = (x[gcmix] - (lcmiv - lcmiv1)* x[lcmiv1]) /
-	    (N*(x[lcmiv] - x[lcmiv1])) - (gcmix - lcmiv1 - 1) / fN;
-	  --ix;
-	  if (dx >= d) {
-	    d = dx;
-	    ig = ix + 1;
-	    ih = iv;
+	  else {
+	      /* If the next point of either the GCM or LCM is from the GCM,
+	       * calculate the distance here. */
+	      lcmiv1 = lcm[iv - 1];
+	      dx = (x[gcmix] - (lcmiv - lcmiv1)* x[lcmiv1]) /
+		  (N*(x[lcmiv] - x[lcmiv1])) - (gcmix - lcmiv1 - 1) / fN;
+	      --ix;
+	      if (dx >= d) {
+		  d = dx;
+		  ig = ix + 1;
+		  ih = iv;
+	      }
 	  }
-	}
 
-	/*     If the next point of either the GCM or LCM is from the GCM, */
-	/*     calculate the distance here. */
-
-	if (ix < 1)	ix = 1;
-	if (iv > icv)	iv = icv;
+	  if (ix < 1)	ix = 1;
+	  if (iv > icv)	iv = icv;
       } while (gcm[ix] != lcm[iv]);
     }
     else { /* icx or icv == 2 */
