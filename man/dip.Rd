@@ -41,7 +41,7 @@ dip(x, full.result = FALSE, debug = FALSE)
 \references{
   P. M. Hartigan (1985)
   Computation of the Dip Statistic to Test for Unimodality;
-  \emph{Applied Statistics} \bold{34}, 320--325.
+  \emph{Applied Statistics (JRSS C)} \bold{34}, 320--325.
 
   J. A. Hartigan and P. M. Hartigan (1985)
   The Dip Test of Unimodality;
