@@ -4,14 +4,19 @@
 # "wrong" dip stat: load("/u/maechler/R/Pkgs/diptest/stuff/dipSim_1e5.rda")
 load("/u/maechler/R/Pkgs/diptest/stuff/dipSim_1e6.rda")
 
+## From ./new-simul.R:
+Ns <- 1000001
+
 stopifnot(identical(P.p, as.numeric(colnames(P.dip))),
           identical(nn,  as.numeric(rownames(P.dip))))
 
 names(dimnames(P.dip)) <- c("n","Pr")
+attr(P.dip, "N_1") <- as.integer(Ns - 1)
+
 ## new data set!
 qDiptab <- P.dip
 
-      Pp <- P.p  [  P.p < 1]# not max() = 100% percentile
+Pp <- P.p  [  P.p < 1]# not max() = 100% percentile
 P.dip.Rn <- P.dip[, P.p < 1]*sqrt(nn)
 nP <- length(Pp)
 
