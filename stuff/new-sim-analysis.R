@@ -7,6 +7,9 @@ load("/u/maechler/R/Pkgs/diptest/stuff/dipSim_1e6.rda")
 stopifnot(identical(P.p, as.numeric(colnames(P.dip))),
           identical(nn,  as.numeric(rownames(P.dip))))
 
+names(dimnames(P.dip)) <- c("n","Pr")
+## new data set!
+qDiptab <- P.dip
 
       Pp <- P.p  [  P.p < 1]# not max() = 100% percentile
 P.dip.Rn <- P.dip[, P.p < 1]*sqrt(nn)
