@@ -29,7 +29,7 @@
       ETH Seminar fuer Statistik
       8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.15 2003/07/14 08:48:42 maechler Exp $
+   $Id: dip.c,v 1.16 2003/10/31 18:17:32 maechler Exp $
 */
 
 #include <R.h>
@@ -161,8 +161,13 @@ LOOP_Start:
 	      /* If the next point of either the GCM or LCM is from the GCM,
 	       * calculate the distance here. */
 	      lcmiv1 = lcm[iv - 1];
+/* original
 	      dx = (x[gcmix] - (lcmiv - lcmiv1)* x[lcmiv1]) /
 		  (N*(x[lcmiv] - x[lcmiv1])) - (gcmix - lcmiv1 - 1) / fN;
+*/
+/* Fix by Yong Lu  {is more symmetric to the above case}:*/
+	      dx = (x[gcmix] - x[lcmiv1]) * (lcmiv-lcmiv1) /
+		  (N*(x[lcmiv] - x[lcmiv1]))- (gcmix - lcmiv1 - 1) / fN;
 	      --ix;
 	      if (dx >= d) {
 		  d = dx;
