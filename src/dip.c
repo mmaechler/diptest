@@ -29,7 +29,16 @@
       ETH Seminar fuer Statistik
       8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.19 2003/10/31 21:44:08 maechler Exp $
+---------------
+
+   Two Bug Fixes:
+       =========
+
+   1)	July 30 1994 : For unimodal data, gave "infinite loop"  (end of code)
+   2)	Oct  31 2003 : Yong Lu <lyongu+@cs.cmu.edu> : ")" typo in Fortran
+                       gave wrong result (larger dip than possible) in some cases
+
+   $Id: dip.c,v 1.20 2003/10/31 21:53:02 maechler Exp $
 */
 
 #include <R.h>
@@ -161,11 +170,7 @@ LOOP_Start:
 	      /* If the next point of either the GCM or LCM is from the GCM,
 	       * calculate the distance here. */
 	      lcmiv1 = lcm[iv - 1];
-/* original
-	      dx = (x[gcmix] - (lcmiv - lcmiv1)* x[lcmiv1]) /
-		  (N*(x[lcmiv] - x[lcmiv1])) - (gcmix - lcmiv1 - 1) / fN;
-*/
-/* Fix by Yong Lu  {is more symmetric to the above case}:*/
+/* Fix by Yong Lu {symmetric to above!}; original Fortran: only ")" misplaced! :*/
 	      dx = (x[gcmix] - x[lcmiv1]) * (lcmiv - lcmiv1) /
 		  (x[lcmiv] - x[lcmiv1])- (gcmix - lcmiv1 - 1);
 	      --ix;
@@ -237,7 +242,7 @@ LOOP_Start:
     if (*dip < dipnew)
 	*dip = dipnew;
 
-    /*--- The following 'if' is NECESSARY ! ------------------------------
+    /*--- The following if-clause is NECESSARY  (may loop infinitely otherwise)!
       --- Martin Maechler, Statistics, ETH Zurich, July 30 1994 ---------- */
     if (low == gcm[ig] && high == lcm[ih]) {
       if(*debug)
