@@ -29,25 +29,24 @@
       ETH Seminar fuer Statistik
       8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.16 2003/10/31 18:17:32 maechler Exp $
+   $Id: dip.c,v 1.19 2003/10/31 21:44:08 maechler Exp $
 */
 
 #include <R.h>
 
 /* Subroutine */
 void diptst(double *x, Sint *n,
-	    double *dip, double *xl, double *xu,
-	    Sint *ifault,
-	    Sint *gcm, Sint *lcm,
-	    Sint *mn, Sint *mj, Sint *debug)
+	    double *dip, Sint *lo_hi, Sint *ifault,
+	    Sint *gcm, Sint *lcm, Sint *mn, Sint *mj, Sint *debug)
 {
+#define low  lo_hi[0]
+#define high lo_hi[1]
+
     /* Local variables */
-    int low, high, gcmi1, gcmix,  lcmiv, lcmiv1,
-	mnj, mnmnj, mjk, mjmjk,	  ic, icv, icva, icx, icxa,
-	ig, ih, iv, ix, j, jb, je, jk, jr, k, kb, ke, kr;
+    int gcmi1, gcmix,  lcmiv, lcmiv1, mnj, mnmnj, mjk, mjmjk,
+	ic, icv, icva, icx, icxa, ig, ih, iv, ix,  j, jb, je, jr,  k, kb, ke, kr;
     double dip_l, dip_u, dipnew, d, dx, t, temp, C;
-    int N = *n, N1 = N - 1;
-    double fN = (double)N;
+    int N = *n;
 
     /* Parameter adjustments, so I can do "as with index 1" : x[1]..x[N] */
     --mj;    --mn;
@@ -67,18 +66,20 @@ void diptst(double *x, Sint *n,
 /* Check for all values of X identical, */
 /*     and for 1 <= N < 4. */
 
-    if (N < 4 || x[N] == x[1]) {
-      *xl = x[1];  *xu = x[N];	 *dip = 0.;	 return;
-    }
-
 /* LOW contains the index of the current estimate  of the lower end
    of the modal interval, HIGH contains the index for the upper end.
 */
-
     low = 1;	high = N; /*-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
-    *dip = 1. / N;
 
-    if(*debug) Rprintf("'dip': starting with dip = %5g\n", *dip);
+    if (N < 4 || x[N] == x[1]) {
+	*dip = 0.;	 return;
+    }
+
+/* M.Maechler -- speedup: it saves many divisions by N when we just work with
+ * (N * dip) everywhere but the very end! */
+    *dip = 1.;
+
+    if(*debug) Rprintf("dip() in C: N = %d; starting with N*dip = 1.\n", N);
 
 /* Establish the indices   mn[1..N]  over which combination is necessary
    for the convex MINORANT (GCM) fit.
@@ -100,8 +101,7 @@ void diptst(double *x, Sint *n,
    for the concave MAJORANT (LCM) fit.
 */
     mj[N] = N;
-    for (jk = 1; jk <= N1; ++jk) {
-	k = N - jk;
+    for (k = N - 1; k >= 1; k--) {
 	mj[k] = k + 1;
 	while(1) {
 	  mjk = mj[k];
@@ -148,8 +148,8 @@ LOOP_Start:
 	      /* If the next point of either the GCM or LCM is from the LCM,
 	       * calculate the distance here. */
 	      gcmi1 = gcm[ix + 1];
-	      dx = (lcmiv - gcmi1 + 1) / fN -
-		  (x[lcmiv] - x[gcmi1]) * (gcmix-gcmi1)/(N*(x[gcmix] - x[gcmi1]));
+	      dx = (lcmiv - gcmi1 + 1) -
+		  (x[lcmiv] - x[gcmi1]) * (gcmix - gcmi1)/(x[gcmix] - x[gcmi1]);
 	      ++iv;
 	      if (dx >= d) {
 		  d = dx;
@@ -166,8 +166,8 @@ LOOP_Start:
 		  (N*(x[lcmiv] - x[lcmiv1])) - (gcmix - lcmiv1 - 1) / fN;
 */
 /* Fix by Yong Lu  {is more symmetric to the above case}:*/
-	      dx = (x[gcmix] - x[lcmiv1]) * (lcmiv-lcmiv1) /
-		  (N*(x[lcmiv] - x[lcmiv1]))- (gcmix - lcmiv1 - 1) / fN;
+	      dx = (x[gcmix] - x[lcmiv1]) * (lcmiv - lcmiv1) /
+		  (x[lcmiv] - x[lcmiv1])- (gcmix - lcmiv1 - 1);
 	      --ix;
 	      if (dx >= d) {
 		  d = dx;
@@ -181,7 +181,7 @@ LOOP_Start:
       } while (gcm[ix] != lcm[iv]);
     }
     else { /* icx or icv == 2 */
-      d = 1. / fN;
+      d = 1.;
     }
 
     if (d < *dip)	goto L_END;
@@ -194,19 +194,19 @@ LOOP_Start:
     if (ig != icx) {
       icxa = icx - 1;
       for (j = ig; j <= icxa; ++j) {
-	temp = 1. / fN;
+	temp = 1.;
 	jb = gcm[j + 1];
 	je = gcm[j];
 	if (je - jb > 1 && x[je] != x[jb]) {
-	  C = (je - jb) / (fN * (x[je] - x[jb]));
+	  C = (je - jb) / (x[je] - x[jb]);
 	  for (jr = jb; jr <= je; ++jr) {
-	    t = (jr - jb + 1) / fN - (x[jr] - x[jb]) * C;
-	    if (t > temp)
+	    t = (jr - jb + 1) - (x[jr] - x[jb]) * C;
+	    if (temp < t)
 		temp = t;
 	  }
 	}
 	if (dip_l < temp)
-	  dip_l = temp;
+	    dip_l = temp;
       }
     }
 
@@ -216,25 +216,27 @@ LOOP_Start:
     if (ih != icv) {
       icva = icv - 1;
       for (k = ih; k <= icva; ++k) {
-	temp = 1. / fN;
+	temp = 1.;
 	kb = lcm[k];
 	ke = lcm[k + 1];
 	if (ke - kb > 1 && x[ke] != x[kb]) {
-	  C = (ke - kb) / (fN * (x[ke] - x[kb]));
+	  C = (ke - kb) / (x[ke] - x[kb]);
 	  for (kr = kb; kr <= ke; ++kr) {
-	    t = (x[kr] - x[kb]) * C - (kr - kb - 1) / fN;
-	    if (t > temp) temp = t;
+	    t = (x[kr] - x[kb]) * C - (kr - kb - 1);
+	    if (temp < t)
+		temp = t;
 	  }
 	}
-	if (dip_u < temp) dip_u = temp;
+	if (dip_u < temp)
+	    dip_u = temp;
       }
     }
 
     /* Determine the current maximum. */
+    dipnew = (dip_u > dip_l) ? dip_u : dip_l;
+    if (*dip < dipnew)
+	*dip = dipnew;
 
-    dipnew = dip_l;
-    if (dip_u > dip_l) dipnew = dip_u;
-    if (*dip < dipnew)	 *dip = dipnew;
     /*--- The following 'if' is NECESSARY ! ------------------------------
       --- Martin Maechler, Statistics, ETH Zurich, July 30 1994 ---------- */
     if (low == gcm[ig] && high == lcm[ih]) {
@@ -242,13 +244,17 @@ LOOP_Start:
 	Rprintf("No improvement in  low = %ld  nor  high = %ld --> END\n",
 	       low, high);
     } else {
-      low  = gcm[ig];
-      high = lcm[ih];	   goto LOOP_Start; /* Recycle */
+	low  = gcm[ig];
+	high = lcm[ih];	   goto LOOP_Start; /* Recycle */
     }
 /*---------------------------------------------------------------------------*/
 
 L_END:
-    *xl = x[low];  *xu = x[high];
-    *dip /= 2;
+    /* do this in the caller :
+     *   *xl = x[low];  *xu = x[high];
+     * rather return the (low, high) indices -- automagically via lo_hi[]  */
+    *dip /= (2*N);
     return;
 } /* diptst */
+#undef low
+#undef high
