@@ -20,7 +20,7 @@ iq.p <- 1 + P.p * (Ns - 1)
 ##-                     quantile(U, P.p, names=FALSE)))
 
 P.dip <- matrix(nrow= length(nn), ncol = length(P.p),
-		dimnames = list(paste(nn), paste(formatC(P.p,w=1))))
+		dimnames = list(as.character(nn), formatC(P.p,w=1,digits=7)))
 dip.n <- numeric(Ns)
 Tcpu <- 0
 set.seed(963)
