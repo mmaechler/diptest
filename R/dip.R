@@ -8,8 +8,9 @@
 dip <- function(x, full.result = FALSE, debug = FALSE)
 {
   n <- length(x)
+  x <- sort(unname(x), method="quick")
   r <- .C("diptst",
-          x   = as.double(sort(x)),
+          x   = as.double(x),
           n   = n,
           dip = double(1),
           xl  = double(1),
@@ -20,8 +21,9 @@ dip <- function(x, full.result = FALSE, debug = FALSE)
           mn  =   integer(n),
           mj  =   integer(n),
           debug= as.logical(debug),
+          DUP = FALSE,
           PACKAGE = "diptest")[if(full.result) TRUE else "dip"]
   ##-   if(z$ifault)  #-- something not ok, but this is IMPOSSIBLE here
   ##-     stop(paste("Problem -- C 'message' : ifault = ", z$ifault))
-  if(full.result) r[[1]] else r
+  if(full.result) r else r[[1]]
 }
