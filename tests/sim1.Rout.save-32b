@@ -1,17 +1,18 @@
 
-R : Copyright 2003, The R Development Core Team
-Version 1.8.0 Under development (unstable) (2003-07-11)
+R : Copyright 2003, The R Foundation for Statistical Computing
+Version 1.8.1 alpha (2003-10-31), ISBN 3-900051-00-3
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
-Type `license()' or `licence()' for distribution details.
+Type 'license()' or 'licence()' for distribution details.
 
 R is a collaborative project with many contributors.
-Type `contributors()' for more information.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
 
-Type `demo()' for some demos, `help()' for on-line help, or
-`help.start()' for a HTML browser interface to help.
-Type `q()' to quit R.
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
 
 > library(diptest)
 > 
@@ -24,19 +25,18 @@ Type `q()' to quit R.
 > .p0 <- proc.time()
 > dU100 <- sapply(1:N.sim, function(i) dip(runif(100)))
 > cat('Time elapsed: ', proc.time() - .p0,'\n')
-Time elapsed:  7.08 0.42 8.62 0 0 
+Time elapsed:  6.83 0.12 7.11 0 0 
 > ## Lynne (P IV, 1.6 GHz): ~ 7 s
 > 
 > 100 * round(q100 <- quantile(dU100, p = P.p), 4)
   1%   5%  10%  25%  50%  75%  90%  95%  99% 
-2.10 2.57 2.77 3.16 3.76 4.60 5.67 6.39 7.60 
+2.29 2.56 2.75 3.08 3.54 4.12 4.70 5.09 5.90 
 > 
 > round(1e4 * quantile(dU100, p = seq(0,1, by = 0.01), names = FALSE))
-  [1]   50  210  233  244  251  257  262  266  271  274  277  280  283  286  289
- [16]  292  295  297  300  302  305  307  309  311  314  316  319  321  323  326
- [31]  329  331  333  336  338  341  343  346  348  350  352  355  357  359  362
- [46]  364  366  369  371  373  376  379  382  384  387  389  392  395  398  401
- [61]  405  408  411  414  417  420  424  427  431  434  439  442  446  451  455
- [76]  460  464  469  474  480  486  491  498  504  511  519  528  537  546  556
- [91]  567  577  590  604  621  639  655  683  718  760 1010
+  [1] 191 229 239 246 252 256 261 265 268 272 275 277 280 282 285 287 289 292
+ [19] 294 296 298 300 302 304 305 308 310 312 314 315 317 319 321 323 325 327
+ [37] 329 331 332 334 336 338 340 341 343 345 347 349 351 352 354 356 358 360
+ [55] 362 364 366 368 370 372 374 376 379 381 383 385 387 390 393 395 397 400
+ [73] 403 406 409 412 415 418 421 424 427 431 434 438 442 446 450 455 460 464
+ [91] 470 476 483 489 499 509 520 539 562 590 773
 > 
