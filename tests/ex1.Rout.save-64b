@@ -1,0 +1,159 @@
+
+R : Copyright 2004, The R Foundation for Statistical Computing
+Version 2.0.0 Under development (unstable) (2004-08-12), ISBN 3-900051-00-3
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(diptest)
+> 
+> stopifnot(dip(c(1,1,2,2)) == 1/4)# the maximal value possible: two point dist
+> 
+> ## very first small "unimodal" example --- the  1/(2*n) result:
+> n <- length(u <- cumsum(0:3))
+> d <- dip(u, debug=TRUE)# shows the final if() {added by MM} is really needed
+dip() in C: N = 4; starting with N*dip = 1.
+'dip':LOOP-BEGIN: low, high =     1,    4
+'dip':LOOP-BEGIN: low, high =     1,    3
+'dip':LOOP-BEGIN: low, high =     1,    2
+No improvement in  low = 1  nor  high = 2 --> END
+> stopifnot(d == dip(-u), d == 1/(2*n))# exact "=" for n = 4 !
+> ## Note that I believe this should *not* give 0 (as fmechler@.. did),
+> ## but rather 1/(2n) because that (1/n) / 2  and (1/n)
+> ## is the correct distance between LCM and GCM
+> 
+> ## Small example:
+> x <- c(0,2:3,5:6)
+> d1 <- dip(x,   full=TRUE)
+> d2 <- dip(6-x, full=TRUE)
+> str(d1)
+List of 12
+ $ x     : num [1:5] 0 2 3 5 6
+ $ n     : int 5
+ $ dip   : num 0.133
+ $ lo.hi : int [1:2] 4 5
+ $ ifault: int 0
+ $ gcm   : int [1:5] 5 4 2 1 0
+ $ lcm   : int [1:5] 4 5 0 0 0
+ $ mn    : int [1:5] 1 1 2 2 4
+ $ mj    : int [1:5] 5 3 5 5 5
+ $ debug : logi FALSE
+ $ xl    : num 5
+ $ xu    : num 6
+> str(d2)
+List of 12
+ $ x     : num [1:5] 0 1 3 4 6
+ $ n     : int 5
+ $ dip   : num 0.133
+ $ lo.hi : int [1:2] 1 2
+ $ ifault: int 0
+ $ gcm   : int [1:5] 2 1 1 0 0
+ $ lcm   : int [1:5] 1 2 4 5 0
+ $ mn    : int [1:5] 1 1 1 3 1
+ $ mj    : int [1:5] 2 4 4 5 5
+ $ debug : logi FALSE
+ $ xl    : num 0
+ $ xu    : num 1
+> 
+> ##mult.fig(2, main = "dip() problem with 'mirror x'")
+> par(mfrow = 2:1, mar = .1+c(3,4,2,1), mgp=c(1.5,.6,0), oma = c(0,0,2.1,0))
+> 
+> plot(ecdf(x),verticals=TRUE, col.vert = "light blue")
+> abline(v=-1:7, h = seq(0,1,by=0.2), lty=3, col = "gray")
+> plot(ecdf(6-x),verticals=TRUE, col.vert = "light blue")
+> abline(v=-1:7, h = seq(0,1,by=0.2), lty=3, col = "gray")
+> ## "title" only now
+> mtext("dip() problem with 'mirror x'", side=3, line = 0.8,
++       outer=TRUE, cex = 1.5, font = 2)
+> 
+> 
+> ##  Yong Lu <lyongu+@cs.cmu.edu> example -- a bit smaller
+> x2 <- c(1, rep(2, 9))
+> stopifnot(dip(x2) == dip(3 - x2))
+> str(dip(x2, full=TRUE))
+List of 12
+ $ x     : num [1:10] 1 2 2 2 2 2 2 2 2 2
+ $ n     : int 10
+ $ dip   : num 0.05
+ $ lo.hi : int [1:2] 2 10
+ $ ifault: int 0
+ $ gcm   : int [1:10] 10 2 1 0 0 0 0 0 0 0
+ $ lcm   : int [1:10] 2 10 0 0 0 0 0 0 0 0
+ $ mn    : int [1:10] 1 1 2 2 2 2 2 2 2 2
+ $ mj    : int [1:10] 10 10 10 10 10 10 10 10 10 10
+ $ debug : logi FALSE
+ $ xl    : num 2
+ $ xu    : num 2
+> 
+> ## Real data examples :
+> 
+> data(statfaculty)
+> 
+> str(dip(statfaculty, full = TRUE, debug = TRUE), vec.len = 8)
+dip() in C: N = 63; starting with N*dip = 1.
+'dip':LOOP-BEGIN: low, high =     1,   63
+'dip':LOOP-BEGIN: low, high =     7,   58
+'dip':LOOP-BEGIN: low, high =     7,   44
+List of 12
+ $ x     : num [1:63] 30 33 35 36 37 37 39 39 39 39 39 40 40 40 40 41 42 43 43 43 ...
+ $ n     : int 63
+ $ dip   : num 0.0595
+ $ lo.hi : int [1:2] 7 44
+ $ ifault: int 0
+ $ gcm   : int [1:63] 44 43 38 7 7 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...
+ $ lcm   : int [1:63] 7 11 15 42 44 58 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ...
+ $ mn    : int [1:63] 1 1 2 3 3 5 3 7 7 7 7 7 12 12 12 7 7 7 18 18 ...
+ $ mj    : int [1:63] 44 44 15 15 6 15 11 11 11 11 15 15 15 15 42 42 20 20 20 42 ...
+ $ debug : logi TRUE
+ $ xl    : num 39
+ $ xu    : num 54
+> 
+> data(faithful)
+> fE <- faithful$eruptions
+> str(dip(fE, full = TRUE, debug = TRUE), vec.len= 8)
+dip() in C: N = 272; starting with N*dip = 1.
+'dip':LOOP-BEGIN: low, high =     1,  272
+'dip':LOOP-BEGIN: low, high =   120,  261
+List of 12
+ $ x     : num [1:272] 1.60 1.67 1.70 1.73 1.75 1.75 1.75 1.75 1.75 1.75 ...
+ $ n     : int 272
+ $ dip   : num 0.0924
+ $ lo.hi : int [1:2] 120 261
+ $ ifault: int 0
+ $ gcm   : int [1:272] 261 260 252 181 146 135 120 0 0 0 0 0 0 0 0 0 0 0 0 0 ...
+ $ lcm   : int [1:272] 120 124 233 246 261 79 91 261 268 272 0 0 0 0 0 0 0 0 0 0 ...
+ $ mn    : int [1:272] 1 1 2 2 4 5 5 5 5 5 5 11 5 13 13 13 13 17 17 13 ...
+ $ mj    : int [1:272] 40 40 40 10 10 10 10 10 10 40 12 36 16 16 16 26 19 19 26 26 ...
+ $ debug : logi TRUE
+ $ xl    : num 3.83
+ $ xu    : num 4.83
+> 
+> data(precip)
+> str(dip(precip, full = TRUE, debug = TRUE))
+dip() in C: N = 70; starting with N*dip = 1.
+'dip':LOOP-BEGIN: low, high =     1,   70
+'dip':LOOP-BEGIN: low, high =    19,   64
+'dip':LOOP-BEGIN: low, high =    31,   55
+List of 12
+ $ x     : num [1:70] 7 7.2 7.8 7.8 11.5 13 14 14.6 15 15.2 ...
+ $ n     : int 70
+ $ dip   : num 0.0357
+ $ lo.hi : int [1:2] 31 55
+ $ ifault: int 0
+ $ gcm   : int [1:70] 55 49 31 31 29 19 0 0 0 0 ...
+ $ lcm   : int [1:70] 31 32 35 55 55 64 0 0 0 0 ...
+ $ mn    : int [1:70] 1 1 1 3 1 1 6 7 8 9 ...
+ $ mj    : int [1:70] 2 4 4 64 55 10 10 10 10 55 ...
+ $ debug : logi TRUE
+ $ xl    : num 35.9
+ $ xu    : num 43.4
+> 
