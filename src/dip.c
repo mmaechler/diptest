@@ -1,56 +1,62 @@
-/* dip.f -- translated by f2c (version of 22 July 1992  22:54:52).
-   You must link the resulting object file with the libraries:
-	-lf2c -lm   (in that order)
-
-   Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
-   			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
-
-   $Id: dip.c,v 1.2 1994/07/28 13:28:05 maechler Exp $
-*/
-
-#include "f2c.h"
-
-/* Subroutine */ 
-int diptst (real *x, integer *n, real *dip, 
-	    real *xl, real *xu, integer *ifault, 
-	    integer *gcm, integer *lcm, integer *mn, integer *mj)
-{
-    /* Initialized data */
-
-    static real zero = 0.f;
-    static real half = .5f;
-    static real one  = 1.f;
-
-    /* Local variables */
-    static integer N = *n;
-    static integer high, igcm, icva, icxa;
-    static real temp;
-    static integer igcm1;
-    static real a, b, d;
-    static integer j, k;
-    static real t;
-    static integer igcmx, mjmjk, lcmiv, mnmnj;
-    static real const__;
-    static integer lcmiv1, ic, jb, kb, na, ig, ih;
-    static real dl;
-    static integer je;
-    static real fn;
-    static integer jk, ke;
-    static real du, dx;
-    static integer jr, kr, iv, ix;
-    static real dipnew;
-    static integer mjk, icx, mnj, icv, low, lcm1;
-
-
 /*   ALGORITHM AS 217 APPL. STATIST. (1985) VOL.34, NO.3 
 
      Does the dip calculation for an ordered vector X using the 
      greatest convex minorant and the least concave majorant, skipping 
      through the data using the change points of these distributions. 
 
-     It returns the dip statistic 'DIP' and the modal interval
-     (XL, XU).
+     It returns the dip statistic 'DIP' and the modal interval (XL, XU).
+     				   ===                          ======
+
+   dip.f -- translated by f2c (version of 22 July 1992  22:54:52).
+   You must link the resulting object file with the libraries:
+	-lf2c -lm   (in that order)
+
+   Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
+   			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
+
+   $Id: dip.c,v 1.3 1994/07/28 13:51:52 maechler Exp maechler $
+*/
+
+/*---- this is OLD  K&R C -- can use 'cc' --> no problem with S-plus 3.2
+/* Subroutine */ 
+int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
+float *x;
+long *n;
+float *dip, *xl, *xu;
+long *ifault, *gcm, *lcm, *mn, *mj;
+
+/*--- This would be ANSI : --
+/* int diptst (float *x, long *n, float *dip, 
+/* 	    float *xl, float *xu, long *ifault, 
+/* 	    long *gcm, long *lcm, long *mn, long *mj)
  */
+{
+    /* Initialized data */
+
+    static float zero = (float)0.;
+    static float half = (float).5;
+    static float one = (float)1.;
+
+    /* Local variables */
+    static long high, igcm, icva, icxa;
+    static float temp;
+    static long igcm1;
+    static float a, b, d;
+    static long j, k;
+    static float t;
+    static long igcmx, mjmjk, lcmiv, mnmnj;
+    static float const__;
+    static long lcmiv1, ic, jb, kb, na, ig, ih;
+    static float dl;
+    static long je;
+    static float fn;
+    static long jk, ke;
+    static float du, dx;
+    static long jr, kr, iv, ix;
+    static float dipnew;
+    static long mjk, icx, mnj, icv, low, lcm1;
+
+    long N = *n;
 
     /* Parameter adjustments */
     --mj;
@@ -61,37 +67,28 @@ int diptst (real *x, integer *n, real *dip,
 
     /* Function Body */
 
-    *ifault = 1;
-    if (N <= 0) {	return 0;    }
+    *ifault = 1;    if (N <= 0) { return 0; }
     *ifault = 0;
 
-/*     Check if N = 1 */
+/*  Check that X is sorted --- if not, return with  ifault = 2*/
 
-    if (N == 1) {	
-      *xl = x[1];
-      *xu = x[N];
-      *dip = zero;
-      return 0;
-    }
-
-/*  Else :  Check that X is sorted --- if not, return with  ifault = 2*/
-
-    *ifault = 2;
-    for (k = 2; k <= N; ++k) if (x[k] < x[k - 1]) return 0;
+    *ifault = 2;    for (k = 2; k <= N; ++k) if (x[k] < x[k - 1]) return 0;
     *ifault = 0;
 
 /*     Check for all values of X identical, */
-/*     and for 1 < N < 4. */
+/*     and for 1 <= N < 4. */
 
-    if (x[N] > x[1] && N >= 4) {	goto L5;
+    if (N < 4 || x[N] == x[1]) {	
+      *xl = x[1];
+      *xu = x[N];
+      *dip = zero;      return 0;
     }
-L4:
 
 /*     LOW contains the index of the current estimate  of the lower end
        of the modal interval, HIGH contains the index for the upper end. 
 */
-L5:
-    fn = (real) (N);
+
+    fn = (float) (N);
     low = 1;
     high = N;
     *dip = one / fn;
@@ -99,7 +96,7 @@ L5:
     *xu = x[high];
 
 /*     Establish the indices over which combination is necessary for the 
-       convex minorant fit.
+       convex MINORANT fit.
 */
     mn[1] = 1;
     for (j = 2; j <= N; ++j) {
@@ -107,8 +104,8 @@ L5:
 L25:
 	mnj = mn[j];
 	mnmnj = mn[mnj];
-	a = (real) (mnj - mnmnj);
-	b = (real) (j - mnj);
+	a = (float) (mnj - mnmnj);
+	b = (float) (j - mnj);
 	if (mnj == 1 || (x[j] - x[mnj]) * a < (x[mnj] - x[mnmnj]) * b) {
 	    goto L28;
 	}
@@ -119,7 +116,7 @@ L28:
     }
 
 /*     Establish the indices over which combination is necessary for the 
-       concave majorant fit. 
+       concave MAJORANT fit. 
 */
 
     mj[N] = N;
@@ -130,8 +127,8 @@ L28:
 L32:
 	mjk = mj[k];
 	mjmjk = mj[mjk];
-	a = (real) (mjk - mjmjk);
-	b = (real) (k - mjk);
+	a = (float) (mjk - mjmjk);
+	b = (float) (k - mjk);
 	if (mjk == N || (x[k] - x[mjk]) * a < (x[mjk] - x[mjmjk]) * b) {
 	    goto L34;
 	}
@@ -189,8 +186,8 @@ L50:
 /*     calculate the distance here. */
 
     lcmiv1 = lcm[iv - 1];
-    a = (real) (lcmiv - lcmiv1);
-    b = (real) (igcmx - lcmiv1 - 1);
+    a = (float) (lcmiv - lcmiv1);
+    b = (float) (igcmx - lcmiv1 - 1);
     dx = (x[igcmx] - x[lcmiv1] * a) / (fn * (x[lcmiv] - x[lcmiv1])) - b / fn;
     --ix;
     if (dx < d) {	goto L60;    }
@@ -206,8 +203,8 @@ L55:
     lcmiv = lcm[iv];
     igcm = gcm[ix];
     igcm1 = gcm[ix + 1];
-    a = (real) (lcmiv - igcm1 + 1);
-    b = (real) (igcm - igcm1);
+    a = (float) (lcmiv - igcm1 + 1);
+    b = (float) (igcm - igcm1);
     dx = a / fn - (x[lcmiv] - x[igcm1]) * b / (fn * (x[igcm] - x[igcm1]));
     ++iv;
     if (dx < d) {	goto L60;    }
@@ -223,58 +220,57 @@ L60:
     }
     if (gcm[ix] != lcm[iv]) {	goto L50;    }
 L65:
-    if (d < *dip) {	goto L100;    }
+    if (d < *dip) {	goto L_END;    }
 
 /*     Calculate the DIPs for the current LOW and HIGH. */
 
 /*     The DIP for the convex minorant. */
 
     dl = zero;
-    if (ig == icx) {	goto L80;    }
-    icxa = icx - 1;
-    for (j = ig; j <= icxa; ++j) {
+    if (ig != icx) {
+      icxa = icx - 1;
+      for (j = ig; j <= icxa; ++j) {
 	temp = one / fn;
 	jb = gcm[j + 1];
 	je = gcm[j];
-	if (je - jb <= 1) {	    goto L74;	}
-	if (x[je] == x[jb]) {	    goto L74;	}
-	a = (real) (je - jb);
-	const__ = a / (fn * (x[je] - x[jb]));
-	for (jr = jb; jr <= je; ++jr) {
-	    b = (real) (jr - jb + 1);
+	if (je - jb > 1 && x[je] != x[jb]) {
+	  a = (float) (je - jb);
+	  const__ = a / (fn * (x[je] - x[jb]));
+	  for (jr = jb; jr <= je; ++jr) {
+	    b = (float) (jr - jb + 1);
 	    t = b / fn - (x[jr] - x[jb]) * const__;
 	    if (t > temp) { temp = t; }
+	  }
 	}
-L74:
+
 	if (dl < temp) { dl = temp; }
+      }
     }
 
 /*     The DIP for the concave majorant. */
 
-L80:
     du = zero;
-    if (ih == icv) {	goto L90;    }
-    icva = icv - 1;
-    for (k = ih; k <= icva; ++k) {
+    if (ih != icv) {
+      icva = icv - 1;
+      for (k = ih; k <= icva; ++k) {
 	temp = one / fn;
 	kb = lcm[k];
 	ke = lcm[k + 1];
-	if (ke - kb <= 1) {	    goto L86;	}
-	if (x[ke] == x[kb]) {	    goto L86;	}
-	a = (real) (ke - kb);
-	const__ = a / (fn * (x[ke] - x[kb]));
-	for (kr = kb; kr <= ke; ++kr) {
-	    b = (real) (kr - kb - 1);
+	if (ke - kb > 1 && x[ke] != x[kb]) {
+	  a = (float) (ke - kb);
+	  const__ = a / (fn * (x[ke] - x[kb]));
+	  for (kr = kb; kr <= ke; ++kr) {
+	    b = (float) (kr - kb - 1);
 	    t = (x[kr] - x[kb]) * const__ - b / fn;
 	    if (t > temp) { temp = t; }
+	  }
 	}
-L86:
 	if (du < temp) { du = temp; }
+      }
     }
 
 /*     Determine the current maximum. */
 
-L90:
     dipnew = dl;
     if (du > dl) {	dipnew = du;    }
     if (*dip < dipnew) { *dip = dipnew;    }
@@ -283,10 +279,11 @@ L90:
 
     goto L40; /* Recycle */
 /* ---------------------------------------------------------------------------*/
-L100:
+
+L_END:
     *dip = half * *dip;
     *xl = x[low];
     *xu = x[high];
 
     return 0;
-} /* diptst_ */
+} /* diptst */
