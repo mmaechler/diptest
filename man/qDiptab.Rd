@@ -6,10 +6,10 @@
   Whereas Hartigan(1985) published a table of empirical percentage
   points of the dip statistic (see \code{\link{dip}}) based on N=9999
   samples of size \eqn{n} from \eqn{U[0,1]}, our table of empirical
-  quantiles is currently based on N=100'001 samples for each \eqn{n}.
+  quantiles is currently based on N=1'000'001 samples for each \eqn{n}.
 }
 \note{
-  Taking N=100'001 ensures that all the \code{\link{quantile}(X, p)}
+  Taking N=1'000'001 ensures that all the \code{\link{quantile}(X, p)}
   used here are exactly order statistics \code{sort(X)[k]}.
 }
 \format{
