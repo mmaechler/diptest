@@ -27,20 +27,21 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.7 1994/07/29 09:29:57 maechler Exp $
+   $Id: dip.c,v 1.8 1994/07/29 10:00:15 maechler Exp $
 */
+#include <stdio.h> /*--- for debugging only ---*/
 
 /* Subroutine */ 
-int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
+int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj, debug)
      float *x; long *n;
      float *dip, *xl, *xu;
-     long *ifault, *gcm, *lcm, *mn, *mj;
+     long *ifault, *gcm, *lcm, *mn, *mj,
+           *debug;
 
 {
     /* Initialized data */
 
     static float zero = (float)0.;
-    static float half = (float).5;
     static float one  = (float)1.;
 
     /* Local variables */
@@ -51,7 +52,7 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
 
     long N = *n;
 
-    /* Parameter adjustments, so I can do "as with index 1 : x[1]..x[N] */
+    /* Parameter adjustments, so I can do "as with index 1" : x[1]..x[N] */
     --mj;    --mn;
     --lcm;   --gcm;
     --x;
@@ -74,16 +75,18 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
       *xl = x[1];  *xu = x[N];   *dip = zero;      return 0;
     }
 
-/*     LOW contains the index of the current estimate  of the lower end
-       of the modal interval, HIGH contains the index for the upper end. 
+/* LOW contains the index of the current estimate  of the lower end
+   of the modal interval, HIGH contains the index for the upper end. 
 */
 
     low = 1;    high = N; /*-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
     fn = (float) (N);
     *dip = one / fn;
 
-/*     Establish the indices over which combination is necessary for the 
-       convex MINORANT fit.
+    if(*debug) printf( "'dip': starting with dip = %5g\n", *dip);
+
+/* Establish the indices   mn[1..N]  over which combination is necessary
+   for the convex MINORANT (GCM) fit.
 */
     mn[1] = 1;
     for (j = 2; j <= N; ++j) {
@@ -99,10 +102,9 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
 	}
     }
 
-/*     Establish the indices over which combination is necessary for the 
-       concave MAJORANT fit. 
+/* Establish the indices   mj[1..N]  over which combination is necessary
+   for the concave MAJORANT (LCM) fit. 
 */
-
     mj[N] = N;
     for (jk = 1; jk <= N1; ++jk) {
 	k = N - jk;
@@ -122,6 +124,8 @@ int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
 LOOP_Start:
 
 /* Collect the change points for the GCM from HIGH to LOW. */
+
+    if(*debug) printf( "'dip':LOOP-BEGIN: low, high = %5ld,%5ld\n", low,high);
 
     ic = 1; gcm[1] = high;
     while(gcm[ic] > low) {
@@ -248,12 +252,18 @@ LOOP_Start:
     dipnew = dip_l;
     if (dip_u > dip_l) dipnew = dip_u;
     if (*dip < dipnew)   *dip = dipnew;
-    low  = gcm[ig];
-    high = lcm[ih];
-
-    goto LOOP_Start; /* Recycle */
+    /*--- The following 'if' is NECESSARY ! ------------------------------
+      --- Martin Maechler, Statistics, ETH Zurich, July 30 1994 ---------- */
+    if (low == gcm[ig] && high == lcm[ih]) {
+      if(debug) 
+	printf("No improvement in  low = %ld  nor  high = %ld --> END\n",
+	       low, high);
+    } else {
+      low  = gcm[ig];
+      high = lcm[ih];      goto LOOP_Start; /* Recycle */
+    }
 /*---------------------------------------------------------------------------*/
 
 L_END:
-    *xl = x[low];  *xu = x[high];  *dip = half * *dip;    return 0;
+    *xl = x[low];  *xu = x[high];  *dip = (float)0.5 * *dip;    return 0;
 } /* diptst */
