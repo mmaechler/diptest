@@ -1,4 +1,4 @@
-
+-- $Id$
 
 hartigan.data <- scan()
  30 33 35 36 37 37 39 39 39 39 39 40 40 40 40 41 42 43 43 43 44 44 45 45 46
@@ -31,6 +31,17 @@ dip <- function(x, full.result = FALSE)
 
 dip(hartigan.data) ## Should give   0.05952381
 str(dip.hh <- dip(hartigan.data, full = T))
+
+## NOTA BENE:  dip(1:10) gives INFINITE LOOP (error in Hartigan's Algorithm!)
+
+dip.1.10_rep(0,100)
+unix.time(for(i in 1:100) dip.1.10[i] <- dip(jitter(1:10)))
+##--> 2.3666 CPU sec. on Sparstation 10 (ingrid)
+summary(dip.1.10)
+##-  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##-  0.05 0.05757 0.06016 0.05979 0.06237 0.06686
+##-  0.05   0.058 0.06027 0.06011 0.06231 0.06696
+##-- ~~~~ EXAKT (9 times out of 200)
 
 cdf <- function(x, X=x)
 {
