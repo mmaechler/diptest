@@ -23,6 +23,7 @@ stopifnot(identical(sort(U)[iq.p], ## , partial=iq.p, method="quick"
 
 P.dip <- matrix(nrow= length(nn), ncol = length(P.p),
 		dimnames = list(as.character(nn), formatC(P.p,w=1,digits=7)))
+attr(P.dip, "N_1") <- Ns - 1
 dip.n <- numeric(Ns)
 Tcpu <- 0
 set.seed(963)
