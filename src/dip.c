@@ -1,11 +1,26 @@
 /*   ALGORITHM AS 217 APPL. STATIST. (1985) VOL.34, NO.3 
 
-     Does the dip calculation for an ordered vector X using the 
-     greatest convex minorant and the least concave majorant, skipping 
-     through the data using the change points of these distributions. 
+  @article{HarP85,
+     author = {P. M. Hartigan},
+     title = {Computation of the Dip Statistic to Test for Unimodality},
+     year = 1985,
+     journal = {Applied Statistics},
+     pages = {320--325},
+     volume = 34 }
+  @article{HarJH85,
+     author = {J. A. Hartigan and P. M. Hartigan},
+     title = {The Dip Test of Unimodality},
+     year = 1985,
+     journal = {Ann. of Statistics},
+     pages = {70--84},
+     volume = 13 }
 
-     It returns the dip statistic 'DIP' and the modal interval (XL, XU).
-     				   ===                          ======
+  Does the dip calculation for an ordered vector X using the 
+  greatest convex minorant and the least concave majorant, skipping 
+  through the data using the change points of these distributions. 
+
+  It returns the dip statistic 'DIP' and the modal interval (XL, XU).
+				===                          ======
 
    dip.f -- translated by f2c (version of 22 July 1992  22:54:52).
    You must link the resulting object file with the libraries:
@@ -14,16 +29,15 @@
    Pretty--Edited by 	Martin Maechler <maechler@stat.math.ethz.ch>
    			Seminar fuer Statistik, ETH 8092 Zurich	 SWITZERLAND
 
-   $Id: dip.c,v 1.3 1994/07/28 13:51:52 maechler Exp maechler $
+   $Id: dip.c,v 1.4 1994/07/28 15:18:46 maechler Exp $
 */
 
 /*---- this is OLD  K&R C -- can use 'cc' --> no problem with S-plus 3.2
 /* Subroutine */ 
 int diptst (x, n, dip, xl, xu, ifault, gcm, lcm, mn, mj)
-float *x;
-long *n;
-float *dip, *xl, *xu;
-long *ifault, *gcm, *lcm, *mn, *mj;
+     float *x; long *n;
+     float *dip, *xl, *xu;
+     long *ifault, *gcm, *lcm, *mn, *mj;
 
 /*--- This would be ANSI : --
 /* int diptst (float *x, long *n, float *dip, 
@@ -58,24 +72,24 @@ long *ifault, *gcm, *lcm, *mn, *mj;
 
     long N = *n;
 
-    /* Parameter adjustments */
+    /* Parameter adjustments, so I can do "as with index 1 : x[1]..x[N] */
     --mj;
     --mn;
     --lcm;
     --gcm;
     --x;
 
-    /* Function Body */
+/*-------- Function Body ------------------------------ */
 
     *ifault = 1;    if (N <= 0) { return 0; }
     *ifault = 0;
 
-/*  Check that X is sorted --- if not, return with  ifault = 2*/
+/* Check that X is sorted --- if not, return with  ifault = 2*/
 
     *ifault = 2;    for (k = 2; k <= N; ++k) if (x[k] < x[k - 1]) return 0;
     *ifault = 0;
 
-/*     Check for all values of X identical, */
+/* Check for all values of X identical, */
 /*     and for 1 <= N < 4. */
 
     if (N < 4 || x[N] == x[1]) {	
@@ -88,12 +102,10 @@ long *ifault, *gcm, *lcm, *mn, *mj;
        of the modal interval, HIGH contains the index for the upper end. 
 */
 
+    low = 1;    high = N;
     fn = (float) (N);
-    low = 1;
-    high = N;
     *dip = one / fn;
-    *xl = x[low];
-    *xu = x[high];
+    /**-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
 
 /*     Establish the indices over which combination is necessary for the 
        convex MINORANT fit.
@@ -141,14 +153,16 @@ L34:
 /* ----------------------- Start the cycling. ------------------------------- */
 /*     Collect the change points for the GCM from HIGH to LOW. */
 
-L40:
+LOOP_Start:
     ic = 1;
     gcm[1] = high;
-L42:
-    igcm1 = gcm[ic];
-    ++ic;
-    gcm[ic] = mn[igcm1];
-    if (gcm[ic] > low) {	goto L42;    }
+
+    while(1) {
+      igcm1 = gcm[ic];
+      ++ic;
+      gcm[ic] = mn[igcm1];
+      if (gcm[ic] <= low) {	exit;    }
+    }
     icx = ic;
 
 /*     Collect the change points for the LCM from LOW to HIGH. */
@@ -171,9 +185,7 @@ L44:
 /*     Find the largest distance greater than 'DIP' between the GCM and */
 /*     the LCM from LOW to HIGH. */
 
-    ix = icx - 1;
-    iv = 2;
-    d = zero;
+    ix = icx - 1;    iv = 2;    d = zero;
     if (icx != 2 || icv != 2) {	goto L50;    }
     d = one / fn;
     goto L65;
@@ -277,7 +289,7 @@ L65:
     low = gcm[ig];
     high = lcm[ih];
 
-    goto L40; /* Recycle */
+    goto LOOP_Start; /* Recycle */
 /* ---------------------------------------------------------------------------*/
 
 L_END:
