@@ -15,8 +15,8 @@
 \format{
   A numeric matrix %may change: of dimension 17 * 26,
   where each row corresponds to sample size \eqn{n}, and each column to
-  a probability (percentage) in \eqn{[0,1]}.  The dimnames are coercable
-  to these values, see the examples.
+  a probability (percentage) in \eqn{[0,1]}.  The dimnames are named
+  \code{n} and \code{Pr} and coercable to these values, see the examples.
 }
 \seealso{\code{\link{dip}}, also for the references.}
 \author{Martin Maechler \email{maechler@stat.math.ethz.ch}
@@ -25,9 +25,10 @@
 data(qDiptab)
 str(qDiptab)
 ## the sample sizes `n' :
-(nn <- as.integer(rownames(qDiptab)))
+dnqd <- dimnames(qDiptab)
+(nn <- as.integer(dnqd $n))
 ## the probabilities:
-P.p <- as.numeric(print(colnames(qDiptab)))
+P.p <- as.numeric(print(dnqd $ Pr))
 
 ## This is as "Table 1" in Hartigan & Hartigan (1985) -- but more accurate
 ps <- c(1,5,10,50,90,95,99, 99.5, 99.9)/100

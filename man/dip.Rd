@@ -6,7 +6,7 @@
   and additionally the modal interval.
 }
 \usage{
-dip(x, full.result=FALSE, debug=FALSE)
+dip(x, full.result = FALSE, debug = FALSE)
 }
 \arguments{
   \item{x}{numeric; the data.}
@@ -32,11 +32,11 @@ dip(x, full.result=FALSE, debug=FALSE)
   For \eqn{n \le 3}{n <= 3} where \code{n <- length(x)}, the dip
   statistic is always zero, i.e., there's no possible dip test.
 
-  Yong Lu \email{lyongu+@cs.cmu.edu} found in Oct 2003, that the code
+  Yong Lu \email{lyongu+@cs.cmu.edu} found in Oct 2003 that the code
   wasn't giving symmetric results for mirrored data (and was giving
-  results of almost , and then found the reason, a misplaced ")" in the
+  results of almost 1, and then found the reason, a misplaced ")" in the
   original Fortran code.  This bug has been corrected for diptest
-  version 0.25-0
+  version 0.25-0.
 }
 \references{
   P. M. Hartigan (1985)
