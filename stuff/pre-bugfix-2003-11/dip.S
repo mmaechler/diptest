@@ -1,4 +1,9 @@
--- $Id$
+### S-interface to Hartigan's algorithm for "The dip test for unimodality"
+###
+### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
+### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
+
+###-- $Id: dip.S,v 1.2 1994/07/29 08:36:23 maechler Exp $
 
 hartigan.data <- scan()
  30 33 35 36 37 37 39 39 39 39 39 40 40 40 40 41 42 43 43 43 44 44 45 45 46
@@ -7,9 +12,14 @@ hartigan.data <- scan()
 
 dip <- function(x, full.result = FALSE)
 {
-  ## Load in ANY case ! 
-  if(!is.loaded(symbol.C("diptst")))
-    dyn.load2("dip.o")#, userlibs="-lf2c")
+  ## Purpose: Compute the "Dip test for unimodality" (statistic)
+  ## -------------------------------------------------------------------------
+  ## Arguments: x: the Data, full.result: return also 'xl', 'xu' (modal interv.)
+  ## -------------------------------------------------------------------------
+  ## Author: Martin Maechler <maechler@stat.math.ethz.ch>, Jul 94
+  ##      from 1st version of   Dario Ringach <dario@wotan.cns.nyu.edu>
+  
+  if(!is.loaded(symbol.C("diptst"))) dyn.load2("dip.o")
 
   n <- length(x)
   ii <- if(full.result) 1:10 else  "dip"
