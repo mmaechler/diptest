@@ -24,12 +24,12 @@ str(dd <- cbind(expand.grid(n=n, p=Pcp), rq = c(rq)))
 coplot(rq ~ p | log10(n), data = dd)
 coplot(p ~ rq | log10(n), data = dd)
 
-logit <- function(p) log(p/(1-p))
-coplot(logit(p) ~ rq | log10(n), data = dd)
+## NOTA BENE:  qlogis(.) === logit(.)
+coplot(qlogis(p) ~ rq | log10(n), data = dd)
 
 library(mgcv)
-g1 <- gam(logit(p) ~ s(log(n),rq), data = dd)
-summary(g1) # Deviance explained 88.5%
+g1 <- gam(qlogis(p) ~ s(log(n),rq), data = dd)
+summary(g1) # 21.56 d.f. // Deviance explained 88.5%
 
-## Not quite
+if(FALSE) ## Not quite --- 50 warnings --- need to use  weights! etc
 g2 <- gam(p ~ s(log(n),rq), family = binomial, data = dd)
