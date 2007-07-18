@@ -1,20 +1,37 @@
 ### From the large (Ns = 100001) simulation in
 ### ./new-simul1e5.R
 ###  ~~~~~~~~~~~~~~~
-# "wrong" dip stat: load("/u/maechler/R/Pkgs/diptest/stuff/dipSim_1e5.rda")
-load("/u/maechler/R/Pkgs/diptest/stuff/dipSim_1e6.rda")
 
 ## From ./new-simul.R:
 Ns <- 1000001
 
-stopifnot(identical(P.p, as.numeric(colnames(P.dip))),
-          identical(nn,  as.numeric(rownames(P.dip))))
+if(require("diptest") && is.character(data(qDiptab))) {
+    dn <- dimnames(qDiptab)
 
-names(dimnames(P.dip)) <- c("n","Pr")
-attr(P.dip, "N_1") <- as.integer(Ns - 1)
+    nn  <- as.numeric(dn[[1]])
+    P.p <- as.numeric(dn[[2]])
 
-## new data set!
-qDiptab <- P.dip
+} else { ## no longer needed, now we have  'qDiptab'
+    setwd("/u/maechler/R/Pkgs/diptest/stuff")
+
+    ## "wrong" dip stat: load("/u/maechler/R/Pkgs/diptest/stuff/dipSim_1e5.rda")
+    load("dipSim_1e6.rda")
+
+    stopifnot(identical(P.p, as.numeric(colnames(P.dip))),
+              identical(nn,  as.numeric(rownames(P.dip))))
+
+    names(dimnames(P.dip)) <- c("n","Pr")
+
+    data(qDiptab, package="diptest")
+    identical(P.dip, qDiptab) # !
+
+    attr(P.dip, "N_1") <- as.integer(Ns - 1)
+
+    ## new data set!
+    qDiptab <- P.dip
+
+} # end {else: no longer needed}
+
 
 Pp <- P.p  [  P.p < 1]# not max() = 100% percentile
 P.dip.Rn <- P.dip[, P.p < 1]*sqrt(nn)
@@ -37,14 +54,25 @@ mPerclegend <- function(x,y, pr) {
            lty = rev(rep(1:5,length=nP)), bty='n')
 }
 
-matplot(nn, P.dip.Rn, type='n', xlab = 'n  [log scale]', ylab = y.tit,
+## for paper --- write a vignette !! ---
+sfsmisc::pdf.latex("dip_critical.pdf")
+## for print out, or "sending along":
+sfsmisc::pdf.do("dip_critical.pdf")
+
+matplot(nn, P.dip.Rn, type = "n", yaxt = "n",
+        xlab = 'n  [log scale]', ylab = y.tit,
         xlim = range(1.5,nn), log='x', main= nqdip.tit)
+abline(h = seq(0.1, 0.9, by = 0.05), col = "gray80", lty = 3)
+op <- par(las=2); for(i in c(2,4)) axis(i, at = seq(0.1,0.9, by=0.1)); par(op)
 mPerclegend(1.0, 0.95, Pp)
 matlines(nn, P.dip.Rn[, "0.5"], lwd = 3, col = "dark gray")
 matlines(nn, P.dip.Rn, type = 'o')
 mtext(paste(Ns, " simulated samples"), 3, line=0)
-mtext(paste("/u/maechler/R/Pkgs/diptest/stuff/", date(),sep="\n"),
-      4, cex=.8, adj=0)
+mtext("© Martin Maechler, ETH Zurich", 1, line = 3.2, adj = 1)
+
+pdf.end()
+
+mtext(paste(getwd(), date(), sep="\n"), 4, cex=.8, adj=0)
 
 ## "research" :
 ## 1. prove that min(dip) = 1/(2 * n)
@@ -74,7 +102,7 @@ matplot(nn[nL], P.dip.Rn[nL,], type='o', xlim = range(50,nn[nL]),
         log='x', xlab = 'n  [log scale]', ylab = y.tit, main = nqdip.tit)
 matlines(nn[nL], P.dip.Rn[nL, "0.5"], lwd = 3, col = "dark gray")
 ##matlines(nn[nL], P.dip.Rn[nL,], type = 'o')
-## FIXME: col, lty are WRONG
+## FIXME: col, lty are WRONG in this legend:
 legend(45, 0.95, legend=
        rev(paste(c(paste(c(1:9,0)),letters)[1:nP],
                  paste(100*Pp,"%",sep=""), sep=": ")),
