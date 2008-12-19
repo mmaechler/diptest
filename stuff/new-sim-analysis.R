@@ -34,7 +34,7 @@ if(require("diptest") && is.character(data(qDiptab))) {
 
 
 Pp <- P.p  [  P.p < 1]# not max() = 100% percentile
-P.dip.Rn <- P.dip[, P.p < 1]*sqrt(nn)
+qDip.Rn <- qDiptab[, P.p < 1]*sqrt(nn)
 nP <- length(Pp)
 
 ## Titles
@@ -54,19 +54,20 @@ mPerclegend <- function(x,y, pr) {
            lty = rev(rep(1:5,length=nP)), bty='n')
 }
 
-## for paper --- write a vignette !! ---
+if(FALSE)## for paper --- write a vignette !! ---
 sfsmisc::pdf.latex("dip_critical.pdf")
 ## for print out, or "sending along":
-sfsmisc::pdf.do("dip_critical.pdf")
 
-matplot(nn, P.dip.Rn, type = "n", yaxt = "n",
+pdf.do("dip_critical.pdf", paper = "a4")
+
+matplot(nn, qDip.Rn, type = "n", yaxt = "n",
         xlab = 'n  [log scale]', ylab = y.tit,
         xlim = range(1.5,nn), log='x', main= nqdip.tit)
 abline(h = seq(0.1, 0.9, by = 0.05), col = "gray80", lty = 3)
 op <- par(las=2); for(i in c(2,4)) axis(i, at = seq(0.1,0.9, by=0.1)); par(op)
 mPerclegend(1.0, 0.95, Pp)
-matlines(nn, P.dip.Rn[, "0.5"], lwd = 3, col = "dark gray")
-matlines(nn, P.dip.Rn, type = 'o')
+matlines(nn, qDip.Rn[, "0.5"], lwd = 3, col = "dark gray")
+matlines(nn, qDip.Rn, type = 'o')
 mtext(paste(Ns, " simulated samples"), 3, line=0)
 mtext("© Martin Maechler, ETH Zurich", 1, line = 3.2, adj = 1)
 
@@ -87,22 +88,20 @@ mtext(paste(getwd(), date(), sep="\n"), 4, cex=.8, adj=0)
 ## log y: --->> more symmetric distributions, but still skewed to the right
 ## -----        (asymptotic) is of interest, but also: how to do interpolation
 nP <- sum(smP <- 0.01 < Pp & Pp <= .999)# only "relevant subset"
-matplot(nn, P.dip.Rn[, smP], type='n', log='xy', xlim = range(1.5,nn),
+matplot(nn, qDip.Rn[, smP], type='n', log='xy', xlim = range(1.5,nn),
         xlab = 'n  [log scale]',ylab = y.titL, main = nqdip.tit)
 mPerclegend(1.0, .75, Pp[smP])
-matlines(nn, P.dip.Rn[, "0.5"], lwd = 3, col = "dark gray")
-matlines(nn, P.dip.Rn[, smP], type = 'o')
-subtit(paste(Ns, " simulated samples"))
+matlines(nn, qDip.Rn[, "0.5"], lwd = 3, col = "dark gray")
+matlines(nn, qDip.Rn[, smP], type = 'o')
+mtext(paste(Ns, " simulated samples"), side = 3, line = 0)
 
 
 
 ### only larger N   to see if it became constant:
-nP <- sum(nL <- nn > 100)
-matplot(nn[nL], P.dip.Rn[nL,], type='o', xlim = range(50,nn[nL]),
+nN <- sum(nL <- nn > 100)
+matplot(nn[nL], qDip.Rn[nL,], type='o', xlim = range(50,nn[nL]),
         log='x', xlab = 'n  [log scale]', ylab = y.tit, main = nqdip.tit)
-matlines(nn[nL], P.dip.Rn[nL, "0.5"], lwd = 3, col = "dark gray")
-##matlines(nn[nL], P.dip.Rn[nL,], type = 'o')
-## FIXME: col, lty are WRONG in this legend:
+matlines(nn[nL], qDip.Rn[nL, "0.5"], lwd = 4, col = "dark gray")
 legend(45, 0.95, legend=
        rev(paste(c(paste(c(1:9,0)),letters)[1:nP],
                  paste(100*Pp,"%",sep=""), sep=": ")),
@@ -111,7 +110,7 @@ legend(45, 0.95, legend=
 
 mult.fig(9, main = "dip(U[0,1]) distribution {simulated} -- for small n")
 for (cn in nn[1:9]) {
-    plot(P.dip[paste(cn),], P.p,
+    plot(qDiptab[paste(cn),], P.p,
          xlab = "dip = d(x[1 .. n])", ylab = expression(P(D >= d)),
          type = 'o', cex = 0.6, main = paste("n = ",cn))
     abline(h=0:1, col="gray")
@@ -148,9 +147,9 @@ P2dens <- function(x, probs, eps.p = 1e-7, xlim = NULL, f.lim = 0.5)
     ## ----------------------------------------------------------------------
     ## Author: Martin Maechler, Date: 14 Jul 2003, 14:57
     if((n <- length(x)) != length(probs))
-        stop("`x' and `probs' must have same length")
+        stop("'x' and 'probs' must have same length")
     if(any(0 > probs | probs > 1))
-        stop("`probs' must be in [0,1]")
+        stop("'probs' must be in [0,1]")
     if(is.unsorted(probs)) {
         sp <- sort(probs, index.return=TRUE)
         x <- x[sp$ix]
@@ -174,7 +173,8 @@ P2dens <- function(x, probs, eps.p = 1e-7, xlim = NULL, f.lim = 0.5)
 
 d1 <- P2dens(-3:3, pr=pnorm(-3:3))
 plot(d1, -7, 7, n = 501)
-# quite fine :
+points(-3:3, d1(-3:3))
+## quite fine :
 curve(dnorm, col = 2, add=TRUE, n = 501)
 
 str(get("Fspl", envir= environment(d1)))
@@ -192,5 +192,5 @@ curve(dgamma(x,shape=1.5), col = 2, add=TRUE, n = 501)
 
 
 ##-- But the thing I wanted fails because of point masses (left border):
-dDips <- apply(P.dip, 1, function(qd) P2dens(qd, pr = P.p))
+dDips <- apply(qDiptab, 1, function(qd) P2dens(qd, pr = P.p))
 ## Error in interpSpline..(.) : values of x must be distinct << !
