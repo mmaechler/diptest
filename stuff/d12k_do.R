@@ -1,7 +1,7 @@
 stopifnot(require("diptest"))
 setwd("/u/maechler/R/Pkgs/diptest/stuff")
 
-N <- 8000
+N <- 12000
 n.sim <- 1000001
 dd <- numeric(n.sim)
 .pt <- proc.time()
@@ -20,5 +20,5 @@ for(i in 1:n.sim) {
 
 nam <- paste("dip", floor(N/1000),"k", sep='')
 assign(nam, dd)
-outf <- paste(nam, "rda", sep=".")
-save(dd, file = outf)
+(outf <- paste(nam, "rda", sep="."))
+save(list = c(nam, "N"), file = outf)
