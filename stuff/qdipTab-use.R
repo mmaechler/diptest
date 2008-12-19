@@ -11,6 +11,8 @@ rq <- sqrt(n) * qDiptab
 
 filled.contour(n, P.p, log10(rq),
                plot.title= contour(n, P.p, log10(rq), add = TRUE))
+
+logit <- qlogis
 contour(n, P.p, logit(rq))
 
 ## correct P = {0,1} to {1/(2N), 1 - 1/(2N)} for N = 1000001 - 1 = 1e6
