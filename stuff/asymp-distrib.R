@@ -1,7 +1,10 @@
 ###----- More  "full simulations" of the asymptotic limit:
 
 setwd("/u/maechler/R/Pkgs/diptest/stuff")
+
+
 ## These all have  n.sim = 1000'001  samples of  dip(runif(N)):
+## where produced by scripts such as  ./d20k_do.R
 load("dip8k.rda")
 load("dip12k.rda")
 load("dip20k.rda")
