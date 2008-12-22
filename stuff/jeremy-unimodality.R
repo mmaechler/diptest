@@ -2,6 +2,7 @@
 ####
 #### After recommendation by Mark Difford,
 ####	on R-help Sep 09, 2008,  Subject  "Re: Modality Test"
+#### https://stat.ethz.ch/pipermail/r-help/2008-September/173308.html
 
 ## TODO [MM] : compare this "seriously" with dip() from my package 'diptest'
 ##
