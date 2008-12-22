@@ -1,3 +1,8 @@
+#### From  http://www.stat.washington.edu/wxs/Stat593-s03/Code/jeremy-unimodality.R
+####
+#### After recommendation by Mark Difford,
+####	on R-help Sep 09, 2008,  Subject  "Re: Modality Test"
+####-----------------------------------------------------------------------------------
 # Diagnostic plots for clustering and the DIP test for unimodality
 # Code written by Jeremy Tantrum, Winter 2003
 #=================================================================
@@ -17,12 +22,12 @@
 # An example of it working: Olive oil data - region 2 - are areas 5 and 6
 # different.
 #
-# 
+#
 # x.labs <- olive.area[olive.region==2]
 # g <- lda(olive[olive.region==2,], x.labs)
-# g.proj <- unclass(g)$scaling  
-#                               
-# x <- olive[olive.region==2,] %*% g.proj 
+# g.proj <- unclass(g)$scaling
+#
+# x <- olive[olive.region==2,] %*% g.proj
 # plot.ucdf(x)
 # plot.silverman(x)
 # x.dip <- calcdip(x,F) #x.dip$dip = 0.149
@@ -273,7 +278,7 @@ findhulls <- function(x.ord,x.cdf,x.mode,plot.it=T,...)
         i <- i - 1
         x.hull1 <- c(x.hull1, hlist[i])
       }
-  x.hull1 <- sort(x.hull1)  
+  x.hull1 <- sort(x.hull1)
   hull2 <- chull(x.ord[x.split2],x.cdf[x.split2])
   n.2 <- sum(x.split2)
   hlist <- c(hull2,hull2,hull2)
