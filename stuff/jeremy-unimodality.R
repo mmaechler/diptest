@@ -25,6 +25,53 @@
 ## An example of it working: Olive oil data - region 2 - are areas 5 and 6
 ## different.
 ##
+## -- MM:  Aargh, 'olives' *differs* from R package to R package
+data(olives, package="classifly")
+str(olives.CF <- olives)
+data(olives, package="TWIX")
+str(olives.TW <- olives)
+if(FALSE)## These are completely different:
+    data(oliveoil, package="pls")
+
+
+## First, the meaning of  'Area' and 'Region' is swapped between the two:
+with(olives.TW, table(Region, Area))
+##                  Area
+## Region            North Sardinia South
+##   Calabria            0        0    56
+##   Coast Sardinia      0       33     0
+##   East Liguria       50        0     0
+##   Inland Sardinia     0       65     0
+##   North Apulia        0        0    25
+##   Sicily              0        0    36
+##   South Apulia        0        0   206
+##   Umbria             51        0     0
+##   West Liguria       50        0     0
+
+with(olives.CF, table(Area, Region))
+##                  Region
+## Area                1   2   3
+##   Calabria         56   0   0
+##   Coast-Sardinia    0  33   0
+##   East-Liguria      0   0  50
+##   Inland-Sardinia   0  65   0
+##   North-Apulia     25   0   0
+##   Sicily           36   0   0
+##   South-Apulia    206   0   0
+##   Umbria            0   0  51
+##   West-Liguria      0   0  50
+
+
+## Not at all the same... aargh
+{ op <- par(ask=TRUE)
+  for(n in names(oo)) { plot(oo[,n], olives[,n], main=n) }
+  par(op) }
+
+## But looking at subsets
+subset(olives.TW, Region == "Coast Sardinia")[, 1:8]
+subset(olives.CF, Area   == "Coast-Sardinia")[, -(1:2)]
+
+1
 ##
 ## x.labs <- olive.area[olive.region==2]
 ## g <- lda(olive[olive.region==2,], x.labs)
