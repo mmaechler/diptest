@@ -33,15 +33,24 @@ dip(x, full.result = FALSE, debug = FALSE)
   statistic is always zero, i.e., there's no possible dip test.
 
   Yong Lu \email{lyongu+@cs.cmu.edu} found in Oct 2003 that the code
-  wasn't giving symmetric results for mirrored data (and was giving
+  was not giving symmetric results for mirrored data (and was giving
   results of almost 1, and then found the reason, a misplaced ")" in the
   original Fortran code.  This bug has been corrected for diptest
   version 0.25-0.
+
+  Nick Cox (Durham Univ.) said (on March 20, 2008 on the Stata-list):\cr
+  As it comes from a bimodal husband-wife collaboration, the name
+  perhaps should be \emph{\dQuote{Hartigan-Hartigan dip test}}, but that
+  does not seem to have caught on.  Some of my less statistical
+  colleagues would sniff out the hegemony of patriarchy there, although
+  which Hartigan is being overlooked is not clear.
 }
 \references{
   P. M. Hartigan (1985)
   Computation of the Dip Statistic to Test for Unimodality;
-  \emph{Applied Statistics (JRSS C)} \bold{34}, 320--325.
+  \emph{Applied Statistics (JRSS C)} \bold{34}, 320--325.\cr
+  Corresponding (buggy!) Fortran code of \sQuote{AS 217} available from Statlib,
+  \url{http://lib.stat.cmu.edu/apstat/217}
 
   J. A. Hartigan and P. M. Hartigan (1985)
   The Dip Test of Unimodality;
@@ -50,7 +59,9 @@ dip(x, full.result = FALSE, debug = FALSE)
 \author{Martin Maechler \email{maechler@stat.math.ethz.ch}, based on
   earlier code from Dario Ringach \email{dario@wotan.cns.nyu.edu}
 }
-\seealso{\code{\link{isoreg}} for isotonic regression.}
+\seealso{\code{\link{isoreg}} for isotonic regression.
+  \code{\link{qDiptab}} on how to get approximate P-values.
+}
 \examples{
 data(statfaculty)
 plot(density(statfaculty))
