@@ -13,16 +13,16 @@ summary(glm.n)
 
 glm.s <- glm(cbind(nMin,Ns) ~ sqrt(nn), family = binomial)
 summary(glm.s)
-glm.is <- glm(cbind(nMin,Ns) ~ I(nn^-0.5), family = binomial)
+glm.is <- glm(cbind(nMin,Ns) ~ I(nn^-0.5), family = binomial) #  "best"
 summary(glm.is)
 glm.I <- glm(cbind(nMin,Ns) ~ I(nn^-1), family = binomial)
 summary(glm.I)
 
 matplot(nn, cbind(nMin
-                  ,Ns * predict(glm.s, type="response")
-                  ,Ns * predict(glm.n, type="response")
-                  ,Ns * predict(glm.is, type="response")
-                  ,Ns * predict(glm.I, type="response")
+                  ,Ns * predict(glm.s, type="response") # "2"
+                  ,Ns * predict(glm.n, type="response") # "3"
+                  ,Ns * predict(glm.is, type="response")# "4" (best!)
+                  ,Ns * predict(glm.I, type="response") # "5"
                   ), type='b',
         log = "xy",
         ylab = "nMin  & 4 different glm() predictions")
