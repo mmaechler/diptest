@@ -84,7 +84,7 @@ c2a <- c2a[,1]
 stopifnot(all(c2a == cl2area),
           all(olives.CF[,2] == areas[c2a[olives.WS[,2]]]))
 
-## Now to work with Jeremy's code, assume he uses Stuetle's version of the data:
+## Now to work with Jeremy's code, assuming he used Stuetzle's version of the data:
 olive.area   <- olives.WS $ Class
 olive.region <- olives.WS $ Region
 i.rest <- !(names(olives.WS) %in% c("Class", "Region"))
@@ -99,11 +99,11 @@ g.proj <- unclass(g)$scaling
 x <- olive[olive.region==2,] %*% g.proj
 plot.ucdf(x)
 plot.silverman(x)
-str(x.dip <- calcdip(x,F)) #-> . $dip = 0.149
+str(x.dip <- calcdip(x, plot.it=FALSE)) #-> . $dip = 0.149
 dips <- rep(0,100)
 for(i in 1:100) {
   x.boot <- unisample(x.dip$unicurve,length(x))
-  dips[i] <- calcdip(x.boot,F)$dip
+  dips[i] <- calcdip(x.boot, plot.it=FALSE)$dip
 }
 (p.value <- sum(dips>x.dip$dip)/100) # 0  ( < 0.01 )
 # < 0.01
