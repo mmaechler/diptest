@@ -2,15 +2,21 @@
 
 setwd("/u/maechler/R/Pkgs/diptest/stuff")
 
-
 ## These all have  n.sim = 1000'001  samples of
 ## dip(runif(N)) for "large N"
 ## where produced by scripts such as  ./d20k_do.R
 N.k.set <- c(8,12,16,20,24,32,36,40)
+## or automatically
+patt <- "^dip(.*)k\\.rda"
+N.k.set <- sort(as.integer(sub(patt, "\\1", list.files(pattern = patt))))
+## for now:
+if(5 %in% N.k.set) { N.k.set <- N.k.set[N.k.set != 5] }
+
 dip.nm <- function(N.k, file=FALSE)
     paste("dip", N.k, if(file)"k.rda" else "k", sep='')
 for(N.k in N.k.set)
     load(dip.nm(print(N.k), file=TRUE))
+
 
 d.dip <- function(N.k, scaleUp = TRUE)
 {
@@ -30,7 +36,9 @@ mFormat <- function(n) sub("([0-9]{3})$", "'\\1", format(n))
 names(N.k.set) <- paste(format(N.k.set), "'000", sep='')
 t(sums <- sapply(N.k.set, function(Nk) summary(d.dip(Nk))))
 ##          Min. 1st Qu. Median   Mean 3rd Qu.   Max.
+##  6'000 0.1777  0.3274 0.3759 0.3876  0.4357 0.9858
 ##  8'000 0.1795  0.3278 0.3765 0.3881  0.4364 0.9772
+## 10'000 0.1750  0.3280 0.3767 0.3884  0.4368 0.9522
 ## 12'000 0.1779  0.3283 0.3770 0.3887  0.4370 0.9421
 ## 16'000 0.1768  0.3285 0.3774 0.3890  0.4373 1.0080
 ## 20'000 0.1689  0.3288 0.3774 0.3891  0.4373 0.9699
@@ -38,6 +46,10 @@ t(sums <- sapply(N.k.set, function(Nk) summary(d.dip(Nk))))
 ## 32'000 0.1758  0.3290 0.3779 0.3896  0.4380 0.9757
 ## 36'000 0.1724  0.3295 0.3783 0.3899  0.4382 1.0500
 ## 40'000 0.1705  0.3294 0.3781 0.3899  0.4382 1.0270
+## 44'000 0.1742  0.3295 0.3782 0.3898  0.4381 0.9693
+## 52'000 0.1752  0.3295 0.3783 0.3900  0.4383 0.9463
+## 60'000 0.1755  0.3295 0.3785 0.3901  0.4384 1.0060
+## 72'000 0.1729  0.3296 0.3785 0.3902  0.4386 1.0100
 
 ## And the empirical densities of the sqrt(n)-blown up look
 ## "practically" identical:
@@ -182,8 +194,9 @@ noquote(cP.vals)
 save(P.vals, fd, fd., fdg, fdw,
      file = "asymp-res.rda")
 
-xl. <- extendrange(knots(Fn20k))
+(xl. <- extendrange(d.dip(20)))
 xi <- seq(xl.[1], xl.[2], length.out = 2000)
+
 plot(xi, Fn20k(xi) - Fn12k(xi), type = "l", col = 2)
 ## looks like the difference is largest where the density is large:
 den20k <- density(sqrt(20000)* dip20k,
@@ -205,12 +218,14 @@ with(den20k, lines(f.scale * y ~ x, col = "pink"))
 
 ##--- Ok, look even closer for systematic:
 require(RColorBrewer)
-opal <- palette(brewer.pal(length(Ns), "Dark2"))
 
-Nmax <- max(N.k.set)
+Nmax <- max(N.k.set)# too large now
+## rather just
+Nmax <- 44
 Fn <- ecdf(d.dip(Nmax))
 Fn.xi <- Fn(xi)
-ii <- seq_along(Ns <- N.k.set[-which.max(N.k.set)])
+ii <- seq_along(Ns <- N.k.set[N.k.set < Nmax])
+opal <- palette(brewer.pal(length(Ns), "Set3"))# "Dark2" if  nColor <= 8
 
 yrng <- range(Fn.xi - ecdf(d.dip(min(Ns)))(xi),
               Fn.xi - ecdf(d.dip(max(Ns)))(xi))
