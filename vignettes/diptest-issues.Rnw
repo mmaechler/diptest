@@ -1,0 +1,104 @@
+\documentclass{article}
+%
+\usepackage{myVignette}
+\usepackage{fullpage}% save trees ;-)
+\usepackage[authoryear,round]{natbib}
+\bibliographystyle{plainnat}
+\newcommand{\noFootnote}[1]{{\small (\textit{#1})}}
+\newcommand{\myOp}[1]{{$\left\langle\ensuremath{#1}\right\rangle$}}
+%
+%%\VignetteIndexEntry{Dip Test Explorations}
+%%\VignetteDepends{diptest}
+\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=7,height=4,strip.white=TRUE,keep.source=TRUE}
+%								          ^^^^^^^^^^^^^^^^
+\title{Dip Test Explorations}
+\author{Martin Maechler\\ Seminar f\"ur Statistik \\ ETH Zurich, \ Switzerland
+  \\\email{maechler@stat.math.ethz.ch}}
+\date{April 2009 ({\tiny typeset on \tiny\today})}
+%
+\begin{document}
+\maketitle
+\begin{abstract}
+\end{abstract}
+
+%% Note: These are explained in '?RweaveLatex' :
+<<preliminaries, echo=FALSE>>=
+require("diptest")
+options(width=75)
+@
+
+\section{Introduction}
+\label{sec:Intro}
+
+%% MM
+FIXME: Need notation
+
+$D_n :=$\texttt{dip( runif(n) )};
+
+but more generally,
+\begin{equation}
+  \label{eq:Dn.F}
+  D_n(F) := D(X_1, X_2, \dots, X_n),  \mbox{ \ \ \texttt{where} } X_i \iid, X_i \sim F.
+\end{equation}
+
+\citasnoun{HarJH85} in their ``seminal'' paper on the dip statistic $D_n$
+already proved that $ \sqrt{n} \; D_n$ converges in distribution, i.e.,
+$ \lim_{n\to\infto}\sqrt{n} \; D_n \isD  D_\infty$.
+
+A considerable part of this paper is devoted to explore the distribution of $D_\infty$.
+
+\bigskip
+
+\section{The Dip in the Dip's Distribution}
+\label{sec:dip_dip}
+We have found empirically that the dip distribution itself starts with a dip.
+Specifically, the minimal possible value of $D_n$ is $\frac{1}{2n}$
+\emph{and} the probability of reaching that value,
+\begin{equation}
+  \label{eq:P.Dn_min}
+  \PR{D_n = \frac{1}{2n}]},
+\end{equation}
+is large for small $n$.
+
+E.g., consider an approximation of the dip distribution for $n=5$,
+<<dip.n-is-5>>=
+D5 <- replicate(10000, dip(runif(5)))
+hist(D5, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(5))))")
+@
+which looks like there was a bug in the software,
+and the phenomenon is still visible for $n=8$,
+<<dip.n-is-8>>=
+D8 <- replicate(10000, dip(runif(8)))
+hist(D8, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(8))))")
+@
+%% NOTE that there's another phenomenon I haven't seen before;
+%% particularly, if we use 100'000 replicates ....
+%--------------------
+% set.seed(11)
+% D11 <- replicate(100000, dip(runif(11)))
+% save(D11, file="/u/maechler/R/Pkgs/diptest/stuff/D11.rda")
+% hist(D11, breaks=128, main = "Histogram of  replicate(100'000, dip(runif(11)))")
+%--------------------
+
+\section{P-values for the Dip Test}
+\label{sec:Pvals}
+
+\subsection{Interpolating the Dip Table}
+\label{sec:interpol}
+
+\subsection{Asymptotic Dip Distribution}
+\label{sec:asymp}
+
+%% Maybe
+\section{Less Conservative Dip Testing}
+
+
+\section{Session Info}
+
+<<sessionInfo, results=tex>>=
+toLatex(sessionInfo())
+@
+
+\bibliography{diptest}
+
+\end{document}
