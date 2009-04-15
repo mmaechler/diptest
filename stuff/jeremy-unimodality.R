@@ -1,3 +1,5 @@
+##-*- mode: R; kept-new-versions: 21; kept-old-versions: 12; -*-
+
 #### From  http://www.stat.washington.edu/wxs/Stat593-s03/Code/jeremy-unimodality.R
 ####
 #### After recommendation by Mark Difford,
@@ -25,72 +27,8 @@
 ##
 ## An example of it working: Olive oil data - region 2 - are areas 5 and 6
 ## different.
-##
-## -- MM:  Aargh, 'olives' *differs* from R package to R package
-data(olives, package="classifly")
-str(olives.CF <- olives)
-data(olives, package="TWIX")
-str(olives.TW <- olives)
-if(FALSE)## These are completely different:
-    data(oliveoil, package="pls")
-
-
-## First, the meaning of  'Area' and 'Region' is swapped between the two:
-with(olives.TW, table(Region, Area))
-##                  Area
-## Region            North Sardinia South
-##   Calabria            0        0    56
-##   Coast Sardinia      0       33     0
-##   East Liguria       50        0     0
-##   Inland Sardinia     0       65     0
-##   North Apulia        0        0    25
-##   Sicily              0        0    36
-##   South Apulia        0        0   206
-##   Umbria             51        0     0
-##   West Liguria       50        0     0
-
-with(olives.CF, table(Area, Region))
-##                  Region
-## Area                1   2   3
-##   Calabria         56   0   0
-##   Coast-Sardinia    0  33   0
-##   East-Liguria      0   0  50
-##   Inland-Sardinia   0  65   0
-##   North-Apulia     25   0   0
-##   Sicily           36   0   0
-##   South-Apulia    206   0   0
-##   Umbria            0   0  51
-##   West-Liguria      0   0  50
-
-
-## Not at all the same... aargh
-{ op <- par(ask=TRUE)
-  for(n in names(oo)) { plot(oo[,n], olives[,n], main=n) }
-  par(op) }
-
-## But looking at subsets
-subset(olives.TW, Region == "Coast Sardinia")[, 1:8]
-subset(olives.CF, Area   == "Coast-Sardinia")[, -(1:2)]
-
-1
-##
-## x.labs <- olive.area[olive.region==2]
-## g <- lda(olive[olive.region==2,], x.labs)
-## g.proj <- unclass(g)$scaling
-##
-## x <- olive[olive.region==2,] %*% g.proj
-## plot.ucdf(x)
-## plot.silverman(x)
-## x.dip <- calcdip(x,F) #x.dip$dip = 0.149
-## dips <- rep(0,100)
-## for(i in 1:100)
-## {
-##   x.boot <- unisample(x.dip$unicurve,length(x))
-##   dips[i] <- calcdip(x.boot,F)$dip
-## }
-## p.value <- sum(dips>x.dip$dip)/100
-## # < 0.01
-##
+## ---> see new file  ./jeremy-unimodality-olives.R
+##                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ##=================================================================
 
@@ -181,7 +119,7 @@ plot.silverman <- function(x,COL1 = 1,COL2 = "grey",...)
   points(x,rep(0,length(x)),pch = '|')
 }
 
-##BELOW HERE ARE functions used by plot.silverman:
+## BELOW HERE ARE functions used by plot.silverman:
 
 critwidth <- function(g.data,start,tol = 0.001,n.points = 200)
 {
@@ -197,7 +135,7 @@ critwidth <- function(g.data,start,tol = 0.001,n.points = 200)
         while(!is.unimodal(density(g.data,window = "g",width = high,n = n.points)))
             high <- high*2
     }
-    ##is.unimodal(low)=F and is.unimodal(high)=T
+    ## is.unimodal(low)=F and is.unimodal(high)=T
     while(high-low > tol) {
         wdth <- 0.5 * (high+low)
         if(is.unimodal(density(g.data,window = "g",width = wdth,n = n.points)))
@@ -211,7 +149,7 @@ critwidth <- function(g.data,start,tol = 0.001,n.points = 200)
 ###########################################################################
 critwidth2 <- function(g.data,h.0,tol = 0.001,n.points = 200)
 {
-    ##h.0 is the critical width for a is.unimodal
+    ## h.0 is the critical width for a is.unimodal
     start <- h.0 + 2 * tol
     if(is.bimodal(density(g.data,window = "g",width = start,n = n.points))) {
         high <- start
@@ -225,7 +163,7 @@ critwidth2 <- function(g.data,h.0,tol = 0.001,n.points = 200)
         while(!is.bimodal(density(g.data,window = "g",width = high,n = n.points)))
             high <- high*2
     }
-    ##is.unimodal(low)=F and is.unimodal(high)=T
+    ## is.unimodal(low)=F and is.unimodal(high)=T
     while(high-low > tol) {
         wdth <- 0.5 * (high+low)
         if(is.bimodal(density(g.data,window = "g",width = wdth,n = n.points)))
@@ -238,7 +176,7 @@ critwidth2 <- function(g.data,h.0,tol = 0.001,n.points = 200)
 
 is.unimodal <- function(dens)
 {
-##dens is a list of dens$x and dens$y
+## dens is a list of dens$x and dens$y
   cdf <- cumsum(dens$y)
   n <- length(cdf)
   cdf.diff1 <- cdf[-1] - cdf[-n]
@@ -248,7 +186,7 @@ is.unimodal <- function(dens)
 
 is.bimodal <- function(dens)
 {
- ##dens is a list of dens$x and dens$y
+ ## dens is a list of dens$x and dens$y
   cdf <- cumsum(dens$y)
   n <- length(cdf)
   cdf.diff1 <- cdf[-1] - cdf[-n]
@@ -258,26 +196,28 @@ is.bimodal <- function(dens)
 
 ##-----------------------------------------------------------------
 
-calcdip <- function(x,plot.it = TRUE,calc.it = TRUE)
+calcdip <- function(x, plot.it = TRUE, calc.it = TRUE)
 {
+    x <- sort(x)
+    stopifnot((n <- length(x)) >= 4)
     h.0 <- critwidth(x,4)
     x.f0 <- density(x,width = h.0$low)
     x.mode <- x.f0$x[order(x.f0$y)[length(x.f0$x)]]
     x.mode2 <- x[order(abs(x-x.mode))[1]]
-    if(x.mode2 < sort(x)[4])
-        x.mode2 <- sort(x)[4]
-    if(x.mode2 > sort(x)[length(x)-4])
-        x.mode2 <- sort(x)[length(x)-4]
-    x.cdf <- (1:length(x))/length(x)
-    hull.out <- findhulls(sort(x),x.cdf,x.mode2,plot.it = plot.it,xlab = "",ylab = "CDF")
-    delta <- rep(0,length(x))
+    if(x.mode2 < x[4])
+        x.mode2 <- x[4]
+    if(x.mode2 > x[n-4])
+        x.mode2 <- x[n-4]
+    x.cdf <- (1:n)/n
+    hull.out <- findhulls(x,x.cdf,x.mode2,plot.it = plot.it,xlab = "",ylab = "CDF")
+    delta <- rep(0,n)
     if(calc.it)
-        for(i in 1:length(x))
-            delta[i] <- abs(x.cdf[i] - fofx(sort(x)[i],hull.out))
+        for(i in 1:n)
+            delta[i] <- abs(x.cdf[i] - fofx(x[i],hull.out))
     return(list(dip = max(delta),unicurve = hull.out))
 }
 
-##and the other functions needed:
+## and the other functions needed:
 unisample <- function(hull.out,size)
 {
     n <- length(hull.out$x)
