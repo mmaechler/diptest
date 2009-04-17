@@ -27,7 +27,7 @@ matplot(nn, cbind(nMin
         log = "xy",
         ylab = "nMin  & 4 different glm() predictions")
 
-## actually with large simulation, "is" are not bad
+## actually with large simulation, "glm.is" are not bad
 plot(nMin ~ nn, type = 'o')
 
 ## or
