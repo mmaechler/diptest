@@ -1,0 +1,65 @@
+
+R version 2.9.0 (2009-04-17)
+Copyright (C) 2009 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> ### If  D_n = D(X_1, ... X_n) is the dip statistic, we have
+> ###     D_n >= 1/(2 n)
+> ###   pm(n) := Pr[ D == 1/(2 n) ]  > 0
+> ###   ==      ------------------------
+> ## and hence the distribution of D_n(X), X ~ U[0,1] starts with a jump,
+> ## from 0 to pm(n) at  d = 1/(2n).
+> 
+> ### Now estimate pm(n) via simulation.
+> ### The simulation is analyzed in file ./minProb-anal.R
+> ###                                      ~~~~~~~~~~~~~~
+> setwd("~/R/Pkgs/diptest/stuff")
+> 
+> library(diptest)
+> 
+> Ns <- 500000 # number of samples (per n)
+> isim <- 1:Ns
+> nn <- c(4:18,20,25,30,35,40,50,60, 75, 100)
+> 
+> nMin <- sapply(nn, function(n)
++                sum(sapply(isim,
++                           function(i) abs(1 - 2*n*dip(runif(n))) < 1e-5)))
+> names(nMin) <- paste(nn)
+> attr(nMin, "Ns") <- Ns
+> ## nMin / Ns == pm(n), i.e. pm(nn)
+> save(nMin, file= "minProb.rda")
+> 
+> proc.time()
+    user   system  elapsed 
+2130.176    2.594 2134.998 
+> sessionInfo()
+R version 2.9.0 (2009-04-17) 
+x86_64-unknown-linux-gnu 
+
+locale:
+LC_CTYPE=de_CH.UTF-8;LC_NUMERIC=C;LC_TIME=en_US.UTF-8;LC_COLLATE=de_CH.UTF-8;LC_MONETARY=C;LC_MESSAGES=de_CH.UTF-8;LC_PAPER=de_CH.UTF-8;LC_NAME=C;LC_ADDRESS=C;LC_TELEPHONE=C;LC_MEASUREMENT=de_CH.UTF-8;LC_IDENTIFICATION=C
+
+attached base packages:
+[1] graphics  grDevices datasets  stats     utils     methods   base     
+
+other attached packages:
+[1] diptest_0.25-2 sfsmisc_1.0-7 
+> 
+> proc.time()
+    user   system  elapsed 
+2130.188    2.605 2135.174 
