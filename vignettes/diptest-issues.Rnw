@@ -2,15 +2,14 @@
 %
 \usepackage{myVignette}
 \usepackage{fullpage}% save trees ;-)
-\usepackage[authoryear,round]{natbib}
+\usepackage[authoryear,round,longnamesfirst]{natbib}
 \bibliographystyle{plainnat}
-\newcommand{\noFootnote}[1]{{\small (\textit{#1})}}
-\newcommand{\myOp}[1]{{$\left\langle\ensuremath{#1}\right\rangle$}}
 %
 %%\VignetteIndexEntry{Dip Test Explorations}
 %%\VignetteDepends{diptest}
-\SweaveOpts{engine=R,eps=FALSE,pdf=TRUE,width=7,height=4,strip.white=TRUE,keep.source=TRUE}
-%								          ^^^^^^^^^^^^^^^^
+\SweaveOpts{engine=R,keep.source=TRUE,strip.white=TRUE}
+%		     ^^^^^^^^^^^^^^^^
+\SweaveOpts{eps=FALSE,pdf=TRUE,width=7,height=4}
 \title{Dip Test Explorations}
 \author{Martin Maechler\\ Seminar f\"ur Statistik \\ ETH Zurich, \ Switzerland
   \\\email{maechler@stat.math.ethz.ch}}
@@ -25,6 +24,7 @@
 <<preliminaries, echo=FALSE>>=
 require("diptest")
 options(width=75)
+set.seed(47)
 @
 
 \section{Introduction}
@@ -41,13 +41,35 @@ but more generally,
   D_n(F) := D(X_1, X_2, \dots, X_n),  \mbox{ \ \ \texttt{where} } X_i \iid, X_i \sim F.
 \end{equation}
 
-\citasnoun{HarJH85} in their ``seminal'' paper on the dip statistic $D_n$
+\citet{HarJH85} in their ``seminal'' paper on the dip statistic $D_n$
 already proved that $ \sqrt{n} \; D_n$ converges in distribution, i.e.,
-$ \lim_{n\to\infto}\sqrt{n} \; D_n \isD  D_\infty$.
+$ \lim_{n\to\infty}\sqrt{n} \; D_n \isD  D_\infty$.
 
 A considerable part of this paper is devoted to explore the distribution of $D_\infty$.
 
 \bigskip
+\section{History of the \texttt{diptest} \R package}
+
+\citet{HarJH85} published a concrete algorithm, using Fortran.
+
+- MM started in 1994, with S-plus code
+
+- several important bug fixes;
+  last one Oct./Nov.~2003
+
+  We have some results of the dip.dist of \emph{before} the bug fix;
+  notably the ``dip of the dip'' probabilities have changed considerably!!
+
+- see rcslog of ../../src/dip.c
+
+\section{21st Century Improvement of  Hartigan$^2$'s Table}
+
+((
+
+Use listing package (or so to more or less ``cut \& paste'' the nice code in
+\texttt{../../stuff/new-simul.Rout-1e6}
+
+))
 
 \section{The Dip in the Dip's Distribution}
 \label{sec:dip_dip}
@@ -56,18 +78,18 @@ Specifically, the minimal possible value of $D_n$ is $\frac{1}{2n}$
 \emph{and} the probability of reaching that value,
 \begin{equation}
   \label{eq:P.Dn_min}
-  \PR{D_n = \frac{1}{2n}]},
+  \PR{D_n = \frac{1}{2n}},
 \end{equation}
 is large for small $n$.
 
 E.g., consider an approximation of the dip distribution for $n=5$,
-<<dip.n-is-5>>=
+<<dip_n-is-5,fig=TRUE>>=
 D5 <- replicate(10000, dip(runif(5)))
 hist(D5, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(5))))")
 @
 which looks like there was a bug in the software,
 and the phenomenon is still visible for $n=8$,
-<<dip.n-is-8>>=
+<<dip_n-is-8,fig=TRUE>>=
 D8 <- replicate(10000, dip(runif(8)))
 hist(D8, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(8))))")
 @
