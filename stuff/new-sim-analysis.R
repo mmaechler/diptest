@@ -1,8 +1,7 @@
 ### From the large (Ns = 100001) simulation in
-### ./new-simul1e5.R
-###  ~~~~~~~~~~~~~~~
+### ./new-simul.R
+###  ~~~~~~~~~~~~
 
-## From ./new-simul.R:
 Ns <- 1000001
 
 if(require("diptest") && is.character(data(qDiptab))) {
@@ -106,6 +105,9 @@ legend(45, 0.95, legend=
        rev(paste(c(paste(c(1:9,0)),letters)[1:nP],
                  paste(100*Pp,"%",sep=""), sep=": ")),
        col = rev(rep(1:6,length=nP)), lty = rev(rep(1:5,length=nP)),bty='n')
+
+##-- Asymptotic : see more in ./asymp-distrib.R
+##                              ~~~~~~~~~~~~~~~
 
 
 mult.fig(9, main = "dip(U[0,1]) distribution {simulated} -- for small n")
@@ -132,7 +134,8 @@ pDip <- function(D, n)
 ## Use derivative of cubic spline interpolation or so?
 
 
-P2dens <- function(x, probs, eps.p = 1e-7, xlim = NULL, f.lim = 0.5)
+P2dens <- function(x, probs, eps.p = 1e-7, xlim = NULL, f.lim = 0.5,
+                   method = c("interpSpline", "monoH.FC", "natural"))
 {
     ## Purpose: Density from probabilty/quantiles -- return a *function*
     ## ----------------------------------------------------------------------
@@ -165,10 +168,26 @@ P2dens <- function(x, probs, eps.p = 1e-7, xlim = NULL, f.lim = 0.5)
         rm(r,d,L,R)
     }
 
-    library(splines) ## even better: use constrained splines: F monotone
-    Fspl <- interpSpline(x, probs)
-    rm(x,probs)
-    function(x) predict(Fspl, x, deriv = 1) $y
+    method <- match.arg(method)
+    switch(method,
+	   "interpSpline" = {
+	       library(splines)
+	       Fspl <- interpSpline(x, probs)
+	       rm(x,probs)
+	       function(x) predict(Fspl, x, deriv = 1) $y
+	   },
+	   "monoH.FC" = {
+	       f <- splinefun(x, probs, method="mono")
+	       formals(f)[["deriv"]] <- 1
+	       f
+	   },
+	   "natural" = {
+	       f <- splinefun(x, probs, method="natural")
+	       formals(f)[["deriv"]] <- 1
+	       f
+	   },
+	   ## otherwise
+	   stop("invalid method ", method))
 }
 
 d1 <- P2dens(-3:3, pr=pnorm(-3:3))
@@ -176,6 +195,19 @@ plot(d1, -7, 7, n = 501)
 points(-3:3, d1(-3:3))
 ## quite fine :
 curve(dnorm, col = 2, add=TRUE, n = 501)
+
+## Now with *monotone* Hermite interpolation --- this is *WORSE* !!
+d2 <- P2dens(-3:3, pr=pnorm(-3:3), method = "mono")
+plot(d2, -7, 7, n = 501, add=TRUE, col="midnightblue")
+points(-3:3, d2(-3:3))
+
+## and more experiments suggest the best (here!) solution being "natural"
+d2 <- P2dens(-3:3, pr=pnorm(-3:3), method = "natural")
+plot(d2, -7, 7, n = 501, add=TRUE, col="midnightblue")
+points(-3:3, d2(-3:3))
+## well,
+x <- seq(-7,7, len=1001)
+all.equal(d1(x), d2(x), tol = 1e-15)# TRUE
 
 str(get("Fspl", envir= environment(d1)))
 ##- List of 2
