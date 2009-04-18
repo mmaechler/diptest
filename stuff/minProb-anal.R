@@ -4,7 +4,10 @@
 setwd("/u/maechler/R/Pkgs/diptest/stuff")
 load(file= "minProb.rda")
 Ns <- attr(nMin, "Ns")
+nMin
 nn <- as.integer(names(nMin))
+nMin[nMin > 0] ## now only goes up to n=13,  even for Ns == 500'000
+
 ## Actually  nMin ~ Bin(pm(n), Ns) --> estimate pm(n) parametrically:
 ##           =====================             ======
 glm.n <- glm(cbind(nMin,Ns) ~ log(nn), family = binomial)
@@ -55,6 +58,8 @@ text(nn, nMin, formatC(signif(nMin/Ns, 2)), adj = -0.2, cex = 0.8)
 ## i.e., for small 'n'  the probability is remarkably high,
 ## where as for n = 5000,
 ## it is only visible if you look very carefully :
+
+##___________ No longer ____ after fixing the 2003-10  bug ______
 
 ### for  n=5000 "5k":
 load("dip5k.rda")# d5k has 100'000 values dip(runif(5000))
