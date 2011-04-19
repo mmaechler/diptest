@@ -7,7 +7,7 @@
 %
 %%\VignetteIndexEntry{Dip Test Explorations}
 %%\VignetteDepends{diptest}
-\SweaveOpts{engine=R,keep.source=TRUE,strip.white=TRUE}
+\SweaveOpts{engine=R,keep.source=TRUE,strip.white=true}
 %		     ^^^^^^^^^^^^^^^^
 \SweaveOpts{eps=FALSE,pdf=TRUE,width=7,height=4}
 \title{Dip Test Explorations}
@@ -48,14 +48,22 @@ $ \lim_{n\to\infty}\sqrt{n} \; D_n \isD  D_\infty$.
 A considerable part of this paper is devoted to explore the distribution of $D_\infty$.
 
 \bigskip
-\section{History of the \texttt{diptest} \R package}
+\section{History of the \texttt{diptest} \RR\ package}
 
-\citet{HarJH85} published a concrete algorithm, using Fortran.
+\citet{HarP85} published an implementation in Fortran of a concrete algorithm,
+% ALGORITHM AS 217 APPL. STATIST. (1985) VOL.34, NO.3
+where the code was also made available on Statlib\footnote{Statlib is now a
+  website, of course, \url{http://lib.stat.cmu.edu/}, but then was \emph{the} preferred way
+  for distributing algorithm for statistical computing, available years
+  before the existence of the WWW, and entailing e-mail and (anonymous) FTP}
 
-- MM started in 1994, with S-plus code
+- MM started in 1994, with S-plus code interfacing to Hartigan's Fortran
 
 - several important bug fixes;
   last one Oct./Nov.~2003
+
+  However, the Fortran code file \url{http://lib.stat.cmu.edu/apstat/217},
+  was last changed {Thu 04 Aug 2005 03:43:28 PM CEST}
 
   We have some results of the dip.dist of \emph{before} the bug fix;
   notably the ``dip of the dip'' probabilities have changed considerably!!
