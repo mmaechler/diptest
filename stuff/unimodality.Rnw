@@ -1,0 +1,168 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[UKenglish]{babel}
+\usepackage{graphicx,natbib,array,subfig}%,lineno}
+\usepackage[user,titleref]{zref}% para fazer referencia ao nome da seção (a o invés do número)
+%\usepackage[font=sf,textfont=md]{caption} %% atenção: incompatível com o pacote subfig!
+%\newcolumntype{M}{>{\small\sffamily}l}
+% \newcolumntype{N}{>{\small\sffamily}c}
+% \setlength\extrarowheight{2pt}
+
+\usepackage{ifthen}
+\newboolean{ONLYME}
+\setboolean{ONLYME}{false} % modificar \SweaveOpts abaixo
+%%%%%%
+%%%%%%%%%%%%%%
+%%% how to use Sweave:
+% Once the Sweave file (this file) has been written, it can be
+% processed in R by typing into a running R session
+%   Sweave("filename.Snw")
+% where filename.Snw is the Sweave file. If R is run in a different directory,
+% one has to provide the full path name. This generates the file filename.tex
+% which can be processed as usual with LATEX.
+%%%
+
+\title{Checking for unimodality}
+\author{Og DeSouza \& Karsten Schönrogge}
+\date{\today}
+\usepackage{xspace} % para manter espaço em branco após os comandos
+                    % montados com newcommand{}
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%% opção global do ``echo''
+\SweaveOpts{echo=T} 
+%%%%%%%%%%%%%%%%%%%%%%%
+\setkeys{Gin}{width=0.5\linewidth} % largura dos gráficos no output final
+\maketitle
+
+<<echo=FALSE>>=
+# largura da linha do R no output final
+options(width=66)   
+
+# parâmetros dos gráficos do R
+
+options(SweaveHooks=list(fig=function() par(pty="s")))
+
+@ 
+\newcommand\x{\textsf{x }\xspace} %  x em sans-serif
+\newcommand\y{\textsf{y }\xspace} % y em sans-serif
+%\linenumbers
+\section{Introduction}
+
+
+
+The R package \texttt{diptest} computes Hartigan's dip test statistic for testing unimodality. It derives from \citet{HartiganHartigan1985Dip}.%, which is itself a \textit{bimodal} husband-wife collaboration!
+The package was written by Martin Maechler (ETH Zürich), based on Fortran and S-plus from Dario Ringach, NYU.edu. It is currently mantainned by Martin Maechler.
+
+The dip value measures the  departure of a sample from unimodality, measuring the maximum
+difference, over all sample points, between the empirical distribution function,
+and the unimodal distribution function that minimizes that maximum
+difference. The test gives the \textit{dip} value, which after conveniently transformed, inform a P-value for the hipothesis that the dataset is best described by an unimodal, as opposed to bimodal, distribution. P-values are calculated by comparing the dip statistic obtained with those for repeated samples of the same size from a uniform distribution.
+
+
+\section{The procedure in R}
+We start by calling the appropriate package\footnote{If you to not have the package installed, simply type \texttt{> install.packages()}, choose your closest mirror and then choose the \texttt{diptest} package from the list.}:
+<<>>=
+library(diptest)
+@ 
+\subsection{Calling and inspecting the dataset}
+Now we call the dataset:
+<<>>=
+microdon <- c(10,10,10,15,15,15,15,20,20,20,25,25,25,30,30,30,30,30,35,35,35,35,35,35,35,35,39,39,39,39,39)
+@ 
+
+\begin{figure}%
+\centering
+<<fig=T>>=
+hist(microdon)
+@ 
+\caption{Histogram for Microdon's raw data}
+\label{fig:histogram}
+\end{figure}
+\begin{figure}
+\centering
+<<fig=T>>=
+ plot(density(microdon))
+@ 
+\caption{Density function for Microdon's raw data.}%
+\label{fig:density}%
+ \end{figure}
+
+\subsection{Calculating}
+
+To calculate the \textit{dip} value, simple type:
+<<>>=
+dvalue <- dip(microdon)
+dvalue
+@  
+\section{P-values}\label{sec:pvalues}
+
+The are two equivalent ways to calculate the P-value for this empirical \textit{dip} value. One way would be to inspect the table of quantiles which is given by \texttt{qDiptab}. This table has probability values in the columns and number of observations in the rows. A drawback is that this table only holds dip values for a limited number of observations, and you end having to use a p-value for the number of observations available in the table that is closest to your actual numbers. This should be no problem if your p-value is not poised in a decision boundary (e.g. p = 0.045). If this is the case, then you would be better off by using the second procedure, that involves simulating dip values for that particular number of observations.
+
+\subsection{Extracting p-values from \texttt{qDiptab}}\label{sec:qDiptab}
+
+In such table, you should locate your empirical value (dip = \Sexpr{round(dvalue,4)}), taking note of its row and column, for they are respectively the number of observations in your dataset (here, n = \Sexpr{length(microdon)}) and the respective Pr value. Then you take one minus the Pr value you find on top of the table, and that is the P value for the hipothesis that your dataset was drawn from a unimodal distribution. A P value of, say, 0.04 would mean that your dataset has only a small chance to belong to an unimodal distribution.
+
+
+So, your dip value is (d=\Sexpr{round(dvalue,4)}), and your dataset has \Sexpr{length(microdon)} observations. You will notice that the \texttt{qDiptab} has only a limited set of rows, meaning that you won't get a row for n =  \Sexpr{length(microdon)} observations. You should then look for the closest one, which would the row for n = 30. There you will find the following dip values:
+
+<<>>=
+n30 <- qDiptab["30",]
+n30
+@ 
+
+In this table, the dip values which are closest to your emprical dip value d = \Sexpr{round(dvalue,4)} are
+<<echo=F,results=hide>>=
+lrgdvalue <- names(n30[n30>dvalue])[1] # finds the Pr value for dip > empirical dip
+lrgdvalue
+smldvalue <- names(n30[n30<dvalue]) # finds all Pr values for dip < empirical dip
+smldvalue
+smldvalue <- smldvalue[length(smldvalue)] # chooses only the smallest Pr value for dip < empirical dip
+smldvalue
+@ 
+\Sexpr{round(n30[[paste(smldvalue)]],4)} (which sits under the column Pr = \Sexpr{smldvalue}),  and  \Sexpr{round(n30[[paste(lrgdvalue)]],4)} (sitting under the column Pr = \Sexpr{lrgdvalue}). That indicates that p-values for your empirical dip value  (d=\Sexpr{round(dvalue,4)}) would be $\Sexpr{1-as.numeric(smldvalue)}<p-value<\Sexpr{1-as.numeric(lrgdvalue)}$, since p-value = 1 - Pr. 
+
+\subsection{Calculating p-values}
+
+Rather than using the \texttt{qDiptab} table, you could calculate the actual p-values for your number of observations. This is done by drawing several dip values out of a uniform distribution having the same number of observations and, then, compare your empirical dip value to see if it differs from that.
+
+First you draw dip values out of 1000 rectangular (uniform) distributions:
+<<>>=
+rdip <- replicate(1000,dip(runif(length(microdon))))
+pvalue <- sum(rdip>dip(microdon))/1000
+pvalue
+@ 
+
+The pvalue now changes to \Sexpr{round(pvalue,4)}, which is actually not too different from that we've calculated at section~\ref{sec:qDiptab} (recall that there we've only approximated the pvalue, because the actual number of observations was not available in \texttt{qDiptab} table).
+
+You migth want to take a look on this new set of dip values, and where does your empirical dip value is located. As you can see in Fig.~\ref{fig:simulate}, most of the simulated dip values are actually larger that your empirical dip value. That is, there is \Sexpr{pvalue*100}\% chance to find a dip value larger than yours in this simulation, therefore, we should consider this empirical value to belong to that uniform distribution, and hence from an unimodal data set. You should recall that  that the dip value is actually a mesurement of the difference between the empirical distribution and its closest unimodal distribution. Therefore, we are only concerned about large dip values, since a small dip value actually means that the empirical distribution is very close a theoretical unimodal distribution.
+\begin{figure}
+<<fig=T>>=
+hist(rdip)
+abline(v=dip(microdon),lty=2)
+text(0.09,200,paste("pvalue",pvalue,sep=" = "))
+@ 
+\caption{A distribution dip values simulated out of a 1000 uniform distributions. The dashed line shows where your empirical dip value is located.}
+\label{fig:simulate}
+\end{figure}
+
+\section{Acknowledgements}
+We thank Martin Maechler for revising this document.
+
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{Hartigan \& Hartigan(1985)}]{HartiganHartigan1985Dip}
+\textbf{Hartigan, J.A. \& Hartigan, P.M.} (1985) The dip test of unimodality.
+\newblock \emph{Annals of Statistics} 13, 70–84.
+
+\end{thebibliography}
+
+\end{document}
