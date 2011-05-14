@@ -39,7 +39,9 @@ plotCI(nn, nMin, uiw = sqrt(nMin*(Ns-nMin)/Ns), type = 'o')
 
 ## in Log-Log scale  -- + error bars
 plotCI(nn, nMin, uiw = 1.96*sqrt(nMin*(Ns-nMin)/Ns), type = 'o', log = 'xy')
-## was plot(nMin ~ nn, type = 'o', log = 'xy')
+## 2011-05-14: AAARGH the above now gives an error!
+## whereas this still works: "was"
+plot(nMin ~ nn, type = 'o', log = 'xy')
 axis(2, at=c(2000,5000,10000))
 axis(1, at=nn)
 
