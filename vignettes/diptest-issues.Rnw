@@ -1,7 +1,7 @@
 \documentclass{article}
 %
 \usepackage{myVignette}
-\usepackage{fullpage}% save trees ;-)
+\usepackage{fullpage}% save trees ;-) --- FIXME use {geometry} package
 \usepackage[authoryear,round,longnamesfirst]{natbib}
 \bibliographystyle{plainnat}
 %
@@ -95,12 +95,14 @@ E.g., consider an approximation of the dip distribution for $n=5$,
 D5 <- replicate(10000, dip(runif(5)))
 hist(D5, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(5))))")
 @
-which looks like there was a bug in the software,
-and the phenomenon is still visible for $n=8$,
+
+which looks as if there was a bug in the software --- but that look is misleading!
+Note how the phenomenon is still visible for $n=8$,
 <<dip_n-is-8,fig=TRUE>>=
 D8 <- replicate(10000, dip(runif(8)))
 hist(D8, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(8))))")
 @
+
 %% NOTE that there's another phenomenon I haven't seen before;
 %% particularly, if we use 100'000 replicates ....
 %--------------------
@@ -109,12 +111,60 @@ hist(D8, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(8))))")
 % save(D11, file="/u/maechler/R/Pkgs/diptest/stuff/D11.rda")
 % hist(D11, breaks=128, main = "Histogram of  replicate(100'000, dip(runif(11)))")
 %--------------------
+FIXME:\\
+use ../../stuff/sim-minProb.R
+and ../../stuff/minProb-anal.R
+
+Further, it can be seen that the \emph{maximal} dip statistic
+is $\frac 1 4 = 0.25$ (for even $n$) and this upper bound can be reached
+simply using the the data $(0,0\,dots,0, \; 1, 1,\dots,1)$, a bi-point mass
+with the mass at each point.
 
 \section{P-values for the Dip Test}
 \label{sec:Pvals}
 
 \subsection{Interpolating the Dip Table}
 \label{sec:interpol}
+Because of the asymptotic distribution,
+$ \lim_{n\to\infty}\sqrt{n} \; D_n \isD  D_\infty$,
+it is makes sense to consider the ``$\sqrt{n} D_n$''--scale,
+even for finite $n$ values:
+<<sqrt-n-qdip,fig=true>>=
+dnqd <- dimnames(qDiptab)
+(nn. <- as.integer(dnqd[["n"]]))
+matplot(nn., qDiptab*sqrt(nn.), type ="o", pch=1, cex = 0.4,
+        log="x", xlab="n   [log scaled]",
+        ylab = expression(sqrt(n) %*% q[D[n]]))
+## Note that  1/2n  is the first possible value (with finite mass),,
+## clearly visible for (very) small n:
+lines(nn., sqrt(nn.)/(2*nn.), col=adjustcolor("yellow2",0.5), lwd=3)
+
+P.p <- as.numeric(print(noquote(dnqd[["Pr"]])))
+## Now look at one well known data set:
+D <- dip(x <- faithful$waiting)
+n <- length(x)
+points(n, sqrt(n)*D, pch=13, cex=2, col= adjustcolor("blue2",.5), lwd=2)
+## a simulated (approximate) P-value for D  is
+mean(D <= replicate(10000, dip(runif(n)))) ## ~ 0.002
+@
+but we can use our table to compute a deterministic (but still approximate,
+as the table is from simulation too) P-value:
+%%% ------------------------------- =====
+%%% ------------------------------- FIXME  -- make this into a documented function!
+%%% ------------------------------- =====
+<<interpolate-dip-table>>=
+## We are in this interval:
+n0 <- nn.[i.n <- findInterval(n, nn.)]
+n1 <- nn.[i.n +1] ; c(n0, n1)
+f.n <- (n - n0)/(n1 - n0)# in [0, 1]
+## Now "find" y-interval:
+y.0 <- sqrt(n0)* qDiptab[i.n  ,]
+y.1 <- sqrt(n1)* qDiptab[i.n+1,]
+(Pval <- 1 - approx(y.0 + f.n*(y.1 - y.0),
+                    P.p,
+                    xout = sqrt(n) * D)[["y"]])
+## 0.018095
+@
 
 \subsection{Asymptotic Dip Distribution}
 \label{sec:asymp}
