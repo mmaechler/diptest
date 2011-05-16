@@ -1,9 +1,9 @@
-### S-interface to Hartigan's algorithm for "The dip test for unimodality"-- $Id$
+### S-interface to Hartigan's algorithm for "The dip test for unimodality"
 ###
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
-###-- $Id: dip.S,v 1.4 1994/07/29 10:01:12 maechler Exp $
+###-- $Id: dip.R,v 1.7 2011/05/16 06:31:59 maechler Exp maechler $
 
 dip <- function(x, full.result = FALSE, dip.min.0 = FALSE, debug = FALSE)
 {
