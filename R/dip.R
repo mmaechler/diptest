@@ -1,14 +1,17 @@
-### S-interface to Hartigan's algorithm for "The dip test for unimodality"
+### S-interface to Hartigan's algorithm for "The dip test for unimodality"-- $Id$
 ###
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
 ###-- $Id: dip.S,v 1.4 1994/07/29 10:01:12 maechler Exp $
 
-dip <- function(x, full.result = FALSE, debug = FALSE)
+dip <- function(x, full.result = FALSE, dip.min.0 = FALSE, debug = FALSE)
 {
   n <- length(x)
   x <- sort(unname(x), method="quick")
+  ## be careful to "duplicate" (as have DUP=FALSE):
+  min.is.0 <- as.logical(dip.min.0)
+  debug <- as.logical(debug)
   r <- .C("diptst",
           x   = as.double(x),
           n   = n,
@@ -19,7 +22,8 @@ dip <- function(x, full.result = FALSE, debug = FALSE)
           lcm =   integer(n),
           mn  =   integer(n),
           mj  =   integer(n),
-          debug= as.logical(debug),
+          min.is.0 = min.is.0,
+          debug = debug,
           DUP = FALSE,
           PACKAGE = "diptest")[if(full.result) TRUE else "dip"]
   ##-   if(z$ifault)  #-- something not ok, but this is IMPOSSIBLE here
