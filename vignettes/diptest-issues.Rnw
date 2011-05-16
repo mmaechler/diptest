@@ -1,31 +1,145 @@
-\documentclass{article}
+\documentclass[article]{jss}
+%\documentclass[nojss,article]{jss}
+%              ----- for the package-vignette, don't use JSS logo, etc
 %
-\usepackage{myVignette}
-\usepackage{fullpage}% save trees ;-) --- FIXME use {geometry} package
-\usepackage[authoryear,round,longnamesfirst]{natbib}
-\bibliographystyle{plainnat}
-%
-%%\VignetteIndexEntry{Dip Test Explorations}
+% \author{Martin Maechler\\ Seminar f\"ur Statistik \\ ETH Zurich, \ Switzerland
+%   \\\email{maechler@stat.math.ethz.ch}}
+\author{Martin M\"achler \\ ETH Zurich}
+\title{Dip Test Distributions, P-values, and other Explorations}
+% \def\mythanks{a version of this paper, for \pkg{nacopula} 0.4\_4, has been published
+%     in JSS, \url{http://www.jstatsoft.org/v39/i09}.}
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Martin M\"achler} %% comma-separated
+\Plaintitle{Dip Test Distributions, P-values, and other Explorations}
+% \Shorttitle{}
+%\date{April 2009 ({\tiny typeset on \tiny\today})}
+%%\VignetteIndexEntry{Dip Test Distributions, P-values, and other Explorations}
 %%\VignetteDepends{diptest}
 \SweaveOpts{engine=R,keep.source=TRUE,strip.white=true}
 %		     ^^^^^^^^^^^^^^^^
 \SweaveOpts{eps=FALSE,pdf=TRUE,width=7,height=4}
-\title{Dip Test Explorations}
-\author{Martin Maechler\\ Seminar f\"ur Statistik \\ ETH Zurich, \ Switzerland
-  \\\email{maechler@stat.math.ethz.ch}}
-\date{April 2009 ({\tiny typeset on \tiny\today})}
+
+%% an abstract and keywords
+\Abstract{
+
+... % FIXME
+
+... % FIXME
+}
+%
+\Keywords{MPFR, Abitrary Precision, Multiple Precision Floating-Point, R}
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{13}
+%% \Issue{9}
+%% \Month{September}
+%% \Year{2004}
+%% \Submitdate{2004-09-29}
+%% \Acceptdate{2004-09-29}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+	Martin M\"achler\\
+	Seminar f\"ur Statistik, HG G~16\\
+	ETH Zurich\\
+	8092 Zurich, Switzerland\\
+	E-mail: \email{maechler@stat.math.ethz.ch}\\
+	URL: \url{http://stat.ethz.ch/people/maechler}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/1/31336-5053
+%% Fax: +43/1/31336-734
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% MM: this is "substituted" by  jss.cls:
+%% need no \usepackage{Sweave.sty}
+
+% \usepackage{myVignette}
+% \usepackage{fullpage}% save trees ;-) --- FIXME use {geometry} package
+% \usepackage[authoryear,round,longnamesfirst]{natbib}
+% \bibliographystyle{plainnat}
+%
+%% Marius' packages
+\usepackage[american]{babel}%for American English
+% \usepackage{microtype}%for character protrusion and font expansion (only with pdflatex)
+\usepackage{amsmath}%sophisticated mathematical formulas with amstex (includes \text{})
+\usepackage{mathtools}%fix amsmath deficiencies
+\usepackage{amssymb}%sophisticated mathematical symbols with amstex (includes \mathbb{})
+% \usepackage{amsthm}%theorem environments
+% \usepackage{bm}%for bold math symbols: \bm (= bold math)
+% %NON-STANDARD:\RequirePackage{bbm}%only for indicator functions
+% \usepackage{enumitem}%for automatic numbering of new enumerate environments
+% \usepackage[
+%   format=hang,
+%   % NOT for JSS: labelsep=space,
+%   justification=justified,
+%   singlelinecheck=false%,
+%   % NOT for JSS: labelfont=bf
+% ]{caption}%for captions
+% \usepackage{tikz}%sophisticated graphics package
+% \usepackage{tabularx}%for special table environment (tabularx-table)
+% \usepackage{booktabs}%for table layout
+
+% This is already in jss above -- but withOUT the  fontsize=\small part !!
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\small,fontshape=sl}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\small}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontsize=\small,fontshape=sl}
+% but when submitting, do get rid of too much vertical space between R
+% input & output, i.e. between Sinput and Soutput:
+\fvset{listparameters={\setlength{\topsep}{0pt}}}% !! quite an effect!
+%%
+%
+\newcommand*{\R}{\proglang{R}}%{\textsf{R}}
+\newcommand*{\Arg}[1]{\texttt{\itshape $\langle$#1$\rangle$}}
+\newcommand*{\file}[1]{{`\normalfont\texttt{#1}'}}
+\newcommand*{\eps}{\varepsilon}
+%
+%% Probability P[.],  Expectation E[.]  etc
+\makeatletter
+%% ==  subsection of our flexible-style "texab.sty" :
+\newcommand{\@pkl}{[}     % Probability Klammer links
+\newcommand{\@pkr}{]}
+\newcommand{\@ekl}{[}     % Erwartungswert Klammer links
+\newcommand{\@ekr}{]}     % Erwartungswert Klammer rechts
+\DeclareMathOperator{\PRSymbol}{P}
+% Next line (\makeright): if #1 == \left then \right #2 else #1 #2
+\newcommand{\makeright}[2]{\ifx#1\left\right#2\else#1#2\fi}
+%% the real commands
+\newcommand{\PR}[2][\left]  {\PRSymbol     #1\@pkl #2 \makeright{#1}{\@pkr}}
+\newcommand{\ERW}[2][\left] {\ERWSymbol    #1\@ekl #2 \makeright{#1}{\@ekr}}
+\makeatother
+\newcommand{\isD}{\ {\stackrel{\mathcal{D}}{=}}\ \ }
+\newcommand*{\iid}{\mbox{ i.i.d. }}
+
 %
 \begin{document}
-\maketitle
-\begin{abstract}
-\end{abstract}
-
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+% \section[About Java]{About \proglang{Java}}
+%% Note: If there is markup in \(sub)section, then it has to be escape as above.
 %% Note: These are explained in '?RweaveLatex' :
-<<preliminaries, echo=FALSE>>=
-require("diptest")
-options(width=75)
+<<preliminaries, echo=FALSE, results=hide>>=
+options(SweaveHooks= list(fig=function() par(mar=c(5.1, 4.1, 1.1, 2.1))),
+        width = 75,
+        digits = 7, # <-- here, keep R's default!
+        prompt = "R> ",
+        continue=" ")
 set.seed(47)
+Sys.setenv(LANGUAGE = "en")
+if(.Platform$OS.type != "windows")
+  Sys.setlocale("LC_MESSAGES","C")
+<<diagnose-lib, echo=FALSE>>=
+if(Sys.getenv("USER") == "maechler")## just for "testing"
+  print( .libPaths() )
 @
+\section[Introduction]{Introduction}% \small~\footnote{\mythanks}}
+% \maketitle
+% \begin{abstract}
+% \end{abstract}
 
 \section{Introduction}
 \label{sec:Intro}
@@ -43,12 +157,15 @@ but more generally,
 
 \citet{HarJH85} in their ``seminal'' paper on the dip statistic $D_n$
 already proved that $ \sqrt{n} \; D_n$ converges in distribution, i.e.,
-$ \lim_{n\to\infty}\sqrt{n} \; D_n \isD  D_\infty$.
+\begin{equation}
+  \label{eq:D.infty}
+ \lim_{n\to\infty}\sqrt{n} \; D_n \isD  D_\infty.
+\end{equation}
 
 A considerable part of this paper is devoted to explore the distribution of $D_\infty$.
 
 \bigskip
-\section{History of the \texttt{diptest} \RR\ package}
+\section[History of the diptest package]{History of the \texttt{diptest} \textsf{R} package}
 
 \citet{HarP85} published an implementation in Fortran of a concrete algorithm,
 % ALGORITHM AS 217 APPL. STATIST. (1985) VOL.34, NO.3
@@ -81,7 +198,7 @@ Use listing package (or so to more or less ``cut \& paste'' the nice code in
 
 \section{The Dip in the Dip's Distribution}
 \label{sec:dip_dip}
-We have found empirically that the dip distribution itself starts with a dip.
+We have found empirically that the dip distribution itself starts with a ``dip''.
 Specifically, the minimal possible value of $D_n$ is $\frac{1}{2n}$
 \emph{and} the probability of reaching that value,
 \begin{equation}
@@ -92,6 +209,7 @@ is large for small $n$.
 
 E.g., consider an approximation of the dip distribution for $n=5$,
 <<dip_n-is-5,fig=TRUE>>=
+require("diptest") # after installing it ..
 D5 <- replicate(10000, dip(runif(5)))
 hist(D5, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(5))))")
 @
@@ -168,6 +286,14 @@ y.1 <- sqrt(n1)* qDiptab[i.n+1,]
 
 \subsection{Asymptotic Dip Distribution}
 \label{sec:asymp}
+We have conducted extensive simulations in order to explore the limit
+distribution of $D_\infty$, i.e., the limit of $\sqrt{n} \; D_n$, (\ref{eq:D.infty}).
+
+Our current \R\ code is in \file{ ../../stuff/asymp-distrib.R }
+but the simulation results (7 Megabytes for each $n$) cannot be assumed to
+be part of the package, nor maybe even to be simply accessible via the internet.
+%% is bandwidth a problem ?  probably no longer in the near future?
+
 
 %% Maybe
 \section{Less Conservative Dip Testing}
