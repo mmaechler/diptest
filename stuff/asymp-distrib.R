@@ -1,4 +1,5 @@
-###----- More  "full simulations" of the asymptotic limit:
+####---- More  "full simulations" of the asymptotic limit:  sqrt(n) * D_n
+####                                     ================
 
 setwd("/u/maechler/R/Pkgs/diptest/stuff")
 
@@ -28,7 +29,9 @@ d.dip <- function(N.k, scaleUp = TRUE)
     if(scaleUp) sqrt(N) * get(nm) else get(nm)
 }
 Nk2char <- function(Nk) {
-    dput(Nk, textConnection(".val", "w", local=TRUE))
+    dput(unname(Nk),
+         textConnection(".val", "w", local=TRUE),
+         control = "S_compatible")# no "10L" but "10"
     .val
 }
 mFormat <- function(n) sub("([0-9]{3})$", "'\\1", format(n))
@@ -53,25 +56,34 @@ t(sums <- sapply(N.k.set, function(Nk) summary(d.dip(Nk))))
 
 ## And the empirical densities of the sqrt(n)-blown up look
 ## "practically" identical:
-plot (density(d.dip(36)))
+plot (density(d.dip(36)), main = "")
+abline(h=0, col="dark gray", lty=3)
 for(N.k in head(N.k.set,-1))
     lines(density(d.dip(N.k)))
-mtext(paste("superimposed dip-distrib. for  N = 1000 * ", Nk2char(N.k.set)))
+title(expression("Dip  distributions"~~~ sqrt(n) * D[n] ~~~
+    "superimposed for"))
+mtext(paste(" n = 1000 *", Nk2char(N.k.set)), line = .5)
 
 ## Could Log-normal fit ?
-plot (d <- density(log(d.dip(max(N.k.set)))))
+plot (d <- density(log(d.dip(max(N.k.set)))), main="")
+abline(h=0, col="dark gray", lty=3)
 for(N.k in head(N.k.set,-1))
     lines(density(log(d.dip(N.k)), bw = d$bw))
-mtext(paste("superimposed log(dip)-distrib. for  N = 1000 * ",
-            Nk2char(N.k.set)))
+title(expression("log(Dip)  distributions"~~~ log(sqrt(n) * D[n]) ~~~
+    "superimposed for"))
+mtext(paste(" n = 1000 *", Nk2char(N.k.set)), line = .5)
+
 
 ## Now only for larger N:
-plot (d <- density(log(d.dip(max(N.k.set)))))
-for(N.k in tail(head(N.k.set,-1), 3))
+(N.k.L <- tail(N.k.set, 4))
+plot (d <- density(log(d.dip(max(N.k.L)))), main="")
+abline(h=0, col="dark gray", lty=3)
+for(N.k in head(N.k.L, -1))
     lines(density(log(d.dip(N.k)), bw = d$bw))
-mtext(paste("superimposed log(dip)-distrib. for N = 1000 * ",
-            Nk2char(tail(N.k.set, 4))))
-
+title(expression("log(Dip)  distributions"~~~ log(sqrt(n) * D[n]) ~~~
+    "superimposed for"))
+mtext(paste(" n = 1000 *", Nk2char(N.k.L)), line = .5)
+## -- below, we *add* to this plot !
 
 ## looks quite symmetric (but is not quite, see below!)
 
@@ -97,7 +109,10 @@ logLik(fd.) # 154112.4 (df=2) --- very different to  fd's
 dlnormFit <- function(x) do.call(dlnorm, c(list(x=x), coef(fd)))
 dnormFit <- function(x) do.call(dnorm, c(list(x=x), coef(fd.)))
 curve(dnormFit, add = TRUE, col = "tomato")
-mtext("dnorm(<fit>) super-imposed", col = "tomato")
+mtext(expression(dnorm(paste(symbol("\341"),# == "left angle", see ?plotmath,
+                             "fit to ", log(sqrt(n) * D[n]),
+                             symbol("\361")# == right angle
+    ))), col = "tomato", line = -1, adj = .95)
 ##-->  log-normal clearly does *not* fit !
 
 
@@ -127,6 +142,7 @@ curve(dgammaFit, add = TRUE, col = "blue3")
 ## is even worse than log-normal
 curve(dweibullFit, add = TRUE, col = "forest green")
 ## is much worse even
+
 
 ###---------> "back" to look at  CDFs ---------------------------------
 
@@ -176,21 +192,25 @@ for(i in 1:(m-1)) {
     }; cat("\n")
 }
 
-round(P.vals, 5)
-cP.vals <- format(round(P.vals,5))
-cP.vals[upper.tri(P.vals)] <- ""
-diag(cP.vals) <- "."
-noquote(cP.vals)
-##        8'000   12'000  16'000  20'000  24'000  32'000  36'000
-## 8'000  .
-## 12'000 0.00005 .
-## 16'000 0.00000 0.01397 .
-## 20'000 0.00000 0.00047 0.19526 .
-## 24'000 0.00000 0.00006 0.03016 0.29203 .
-## 32'000 0.00000 0.00000 0.00021 0.00034 0.02567 .
-## 36'000 0.00000 0.00000 0.00000 0.00000 0.00000 0.00154 .
-##
-## Hmm, not so good .. why is 36'000 different from 32'000 ??
+Matrix::Matrix(round(100* P.vals[,7:14, drop=FALSE],1))
+##        24'000 32'000 36'000 40'000 44'000 52'000 60'000 72'000
+##  6'000    .      .      .      .      .      .      .      .
+##  8'000    .      .      .      .      .      .      .      .
+## 10'000    .      .      .      .      .      .      .      .
+## 12'000    .      .      .      .      .      .      .      .
+## 16'000    3.0    .      .      .      .      .      .      .
+## 20'000   29.2    .      .      .      .      .      .      .
+## 24'000    .      2.6    .      .      .      .      .      .
+## 32'000    2.6    .      0.2    2.1    0.1    .      .      .
+## 36'000    .      0.2    .     40.8   47.1   87.0   13.6   20.9
+## 40'000    .      2.1   40.8    .     45.8    8.6    0.9    1.4
+## 44'000    .      0.1   47.1   45.8    .     20.4    1.9    2.4
+## 52'000    .      .     87.0    8.6   20.4    .     34.2   57.5
+## 60'000    .      .     13.6    0.9    1.9   34.2    .     57.1
+## 72'000    .      .     20.9    1.4    2.4   57.5   57.1    .
+
+## Hmm,  .. why is 36'000 different from 32'000 ??
+
 save(P.vals, fd, fd., fdg, fdw,
      file = "asymp-res.rda")
 
