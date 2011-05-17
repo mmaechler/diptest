@@ -1,5 +1,6 @@
 \name{statfaculty}
 \alias{statfaculty}
+\alias{exHartigan}
 \title{Faculty Quality in Statistics Departments}
 \docType{data}
 \usage{
@@ -8,6 +9,9 @@ data(statfaculty)
 \description{
  Faculty quality in statistics departments was assessed as part of a
  larger study reported by Scully(1982).
+
+ Accidentally, this is also provided as the \code{exHartigan}
+ (\dQuote{\bold{ex}ample of \bold{Hartigan}s'}) data set.
 }
 \format{A numeric vector of 63 (integer) numbers, sorted increasingly,
   as reported by the reference.
@@ -26,5 +30,8 @@ data(statfaculty)
 data(statfaculty)
 plot(dH <- density(statfaculty))
 rug(jitter(statfaculty))
+
+data(exHartigan)
+stopifnot(identical(exHartigan,statfaculty))
 }
 \keyword{datasets}
