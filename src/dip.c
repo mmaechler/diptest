@@ -37,7 +37,7 @@
    1)	July 30 1994 : For unimodal data, gave "infinite loop"  (end of code)
    2)	Oct  31 2003 : Yong Lu <lyongu+@cs.cmu.edu> : ")" typo in Fortran
                        gave wrong result (larger dip than possible) in some cases
-   $Id: dip.c,v 1.21 2003/11/13 07:58:54 maechler Exp $
+   $Id: dip.c,v 1.22 2011/05/17 17:24:20 maechler Exp $
 */
 
 #include <R.h>
@@ -125,9 +125,6 @@ void diptst(double *x, Sint *n_,
 /* ----------------------- Start the cycling. ------------------------------- */
 LOOP_Start:
 
-    if(*debug) Rprintf("'dip': LOOP-BEGIN: 2n*D= %-8.5g, low, high = %5ld,%5ld\n",
-		       *dip, low,high);
-
     /* Collect the change points for the GCM from HIGH to LOW. */
     gcm[1] = high;
     for(i = 1; gcm[i] > low; i++)
@@ -142,13 +139,18 @@ LOOP_Start:
     ih = l_lcm = i; // l_lcm == relevant_length(LCM)
     iv = 2; //  iv, ih  are counters for the concave majorant.
 
+    if(*debug)
+	Rprintf("'dip': LOOP-BEGIN: 2n*D= %-8.5g  [low,high] = [%3d,%3d]; l_lcm/gcm = (%2d,%2d)\n",
+		*dip, low,high, l_lcm,l_gcm);
+
 
 /*	Find the largest distance greater than 'DIP' between the GCM and
  *	the LCM from LOW to HIGH. */
 
     d = 0.;
     if (l_gcm != 2 || l_lcm != 2) {
-      if(*debug) Rprintf("  while(gxm[.] != lcm[]) : ");
+	if(*debug) Rprintf("  while(gxm[.] != lcm[]) :%s",
+			   (*debug >= 2) ? "\n" : " ");
       do { /* gcm[ix] != lcm[iv]  (after first loop) */
 	  int gcmix = gcm[ix],
 	      lcmiv = lcm[iv];
@@ -163,6 +165,7 @@ LOOP_Start:
 		  d = dx;
 		  ig = ix + 1;
 		  ih = iv - 1;
+		  if(*debug >= 2) Rprintf(" L(%d,%d)", ig,ih);
 	      }
 	  }
 	  else {
@@ -177,21 +180,22 @@ LOOP_Start:
 		  d = dx;
 		  ig = ix + 1;
 		  ih = iv;
+		  if(*debug >= 2) Rprintf(" G(%d,%d)", ig,ih);
 	      }
 	  }
 	  if (ix < 1)	ix = 1;
 	  if (iv > l_lcm)	iv = l_lcm;
 	  if(*debug) {
-	      if(*debug >= 2) Rprintf("\n   ix = %d, iv = %d", ix,iv);
+	      if(*debug >= 2) Rprintf(" --> ix = %d, iv = %d\n", ix,iv);
 	      else Rprintf(".");
 	  }
       } while (gcm[ix] != lcm[iv]);
-      if(*debug) Rprintf("\n");
+      if(*debug && *debug < 2) Rprintf("\n");
     }
     else { /* l_gcm or l_lcm == 2 */
 	d = (*min_is_0) ? 0. : 1.;
 	if(*debug)
-	    Rprintf("  ** (l_gcm,l_lcm) = (%d,%d) ==> d := %g\n", l_gcm, l_lcm, d);
+	    Rprintf("  ** (l_lcm,l_gcm) = (%d,%d) ==> d := %g\n", l_lcm, l_gcm, d);
     }
 
     if (d < *dip)	goto L_END;
