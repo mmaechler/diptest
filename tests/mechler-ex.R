@@ -11,6 +11,8 @@ ex2 <- c(0.0198, 0.1961, 0.2898, 0.3184, 0.3687, 0.4336,
 
 ## Multiply them by 10000 here:
 
-str(dip(10000*ex1, full=TRUE, debug=TRUE), digits = 10, vec.len = 12)
+(D1 <- dip(10000*ex1, full=TRUE, debug=2))
+str(D1, digits = 10, vec.len = 12)
 
-str(dip(10000*ex2, full=TRUE, debug=TRUE), digits = 10, vec.len = 12)
+(D2 <- dip(10000*ex2, full=TRUE, debug=2))
+str(D2, digits = 10, vec.len = 12)
