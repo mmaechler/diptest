@@ -3,7 +3,7 @@
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
-###-- $Id: dip.R,v 1.8 2011/05/16 06:34:19 maechler Exp maechler $
+###-- $Id: dip.R,v 1.9 2011/05/17 17:23:30 maechler Exp maechler $
 
 dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 {
@@ -46,17 +46,18 @@ dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 print.dip <- function(x, digits = getOption("digits"), ...)
 {
     stopifnot(is.integer(n <- x$n), is.numeric(D <- x$dip),
-              length(lh <- x$lo.hi) == 2)
+	      length(lh <- x$lo.hi) == 2)
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
-        "\n\n", sep = "")
+	"\n\n", sep = "")
+    xLU.c <- sapply(x$x[lh], formatC, digits=digits, width=1)
     cat("n = ", n,".  Dip statistic, D_n = ",
-        format(D, digits=digits),"; 2n * D_n = ",
-        format(2*n* D, digits=digits),
-        sprintf("\n Modal interval [x[%d], x[%d]] = [%g, %g]\n",
-                lh[1], lh[2], x$x[lh[1]], x$x[lh[2]]),
-        sprintf(" GCM and LCM have %d and %d nodes, respectively\n",
-                sum(x$gcm != 0), sum(x$lcm != 0)),
-        sep="")
+	format(D, digits=digits)," = ",
+	format(2*n* D, digits=digits),"/(2n)\n",
+	sprintf(" Modal interval [xL, xU] = [x[%d], x[%d]] = [%s, %s]\n",
+		lh[1], lh[2], xLU.c[1], xLU.c[2]),
+	sprintf(" GCM and LCM have %d and %d nodes inside [xL, xU], respectively.\n",
+		length(x$gcm), length(x$lcm)),
+	sep="")
     invisible(x)
 }
 
@@ -74,9 +75,9 @@ aLine <- function(r.dip, lType = c("gcm","lcm"),
           type=type, col=col, lwd=lwd)
 }
 
-plot.dip <- function(x, colG="red3", colL="blue3", colM="forest green",
-                     ## for plot.stepfun():
-                     do.points=(n < 1000), col.points=par("col"), col.hor=col.points,
+plot.dip <- function(x, do.points=(n < 20), ## <- plot.stepfun()
+                     colG="red3", colL="blue3", colM="forest green",
+                     col.points=par("col"), col.hor=col.points, ## <- plot.stepfun():
                      doModal=TRUE, doLegend=TRUE, ...)
 {
     stopifnot(is.integer(n <- x$n), is.numeric(D <- x$dip),
@@ -96,8 +97,10 @@ plot.dip <- function(x, colG="red3", colL="blue3", colM="forest green",
     if(doModal) {
         x12 <- x$x[lh]
         abline(v= x12, col = colM, lty = 2)
+        op <- par(mgp = c(3, 1/16, 0))# should not need on.exit(par(op)) here ..
         axis(3, at=x12, label = expression(x[L], x[U]),
-             tick=FALSE, padj = .9, col.axis = colM)
+             tick=FALSE, col.axis = colM)
+        par(op)
     }
     if(doLegend)
         legend("topleft", bty = "n",
