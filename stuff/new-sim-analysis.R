@@ -100,11 +100,11 @@ mtext(paste(Ns, " simulated samples"), side = 3, line = 0)
 nN <- sum(nL <- nn > 100)
 matplot(nn[nL], qDip.Rn[nL,], type='o', xlim = range(50,nn[nL]),
         log='x', xlab = 'n  [log scale]', ylab = y.tit, main = nqdip.tit)
-matlines(nn[nL], qDip.Rn[nL, "0.5"], lwd = 4, col = "dark gray")
-legend(45, 0.95, legend=
-       rev(paste(c(paste(c(1:9,0)),letters)[1:nP],
-                 paste(100*Pp,"%",sep=""), sep=": ")),
-       col = rev(rep(1:6,length=nP)), lty = rev(rep(1:5,length=nP)),bty='n')
+mtext(paste(Ns, " simulated samples"), side = 3, line = 0)
+mPerclegend("topleft", NULL, Pp)
+matlines(nn[nL], qDip.Rn[nL, "0.5"], lwd = 4,
+         col = adjustcolor("black", 0.4))
+
 
 ##-- Asymptotic : see more in ./asymp-distrib.R
 ##                              ~~~~~~~~~~~~~~~
@@ -119,16 +119,6 @@ for (cn in nn[1:9]) {
 }
 ###
 
-##-- now really
-pDip <- function(D, n)
-{
-  ## Purpose:  compute the P-value of dip(X) = D  under H0: X ~ U[0,1]
-  ## ----------------------------------------------------------------------
-  ## Arguments: D : result of dip();  n : sample size
-  ## ----------------------------------------------------------------------
-  ## Author: Martin Maechler, Date: 14 Jul 2003, 09:39
-
-}
 
 ## Another thing: Draw "density" from quantiles only:
 ## Use derivative of cubic spline interpolation or so?
