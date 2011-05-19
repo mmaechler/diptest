@@ -117,11 +117,16 @@
 
 %
 \begin{document}
+\setkeys{Gin}{width=\textwidth}
+% Manuel has
+\setlength{\abovecaptionskip}{-5pt}
+%
 %% include your article here, just as usual
 %% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
 % \section[About Java]{About \proglang{Java}}
 %% Note: If there is markup in \(sub)section, then it has to be escape as above.
 %% Note: These are explained in '?RweaveLatex' :
+\begin{footnotesize}
 <<preliminaries, echo=FALSE, results=hide>>=
 options(SweaveHooks= list(fig=function() par(mar=c(5.1, 4.1, 1.1, 2.1))),
         width = 75,
@@ -132,16 +137,23 @@ set.seed(47)
 Sys.setenv(LANGUAGE = "en")
 if(.Platform$OS.type != "windows")
   Sys.setlocale("LC_MESSAGES","C")
+
+## In order to  save() and load() expensive results
+thisDir <- system.file('doc', package='diptest')
+xtraDir <- if(Sys.getenv("USER") == "maechler")
+    "~/R/Pkgs/diptest/stuff" else thisDir
+res1.file <- file.path(thisDir, "aggr_results.Rdata")
+
 <<diagnose-lib, echo=FALSE>>=
 if(Sys.getenv("USER") == "maechler")## just for "testing"
   print( .libPaths() )
 @
-\section[Introduction]{Introduction}% \small~\footnote{\mythanks}}
+\end{footnotesize}
 % \maketitle
 % \begin{abstract}
 % \end{abstract}
 
-\section{Introduction}
+\section[Introduction]{Introduction}% \small~\footnote{\mythanks}}
 \label{sec:Intro}
 
 %% MM
@@ -221,25 +233,60 @@ D8 <- replicate(10000, dip(runif(8)))
 hist(D8, breaks=128, main = "Histogram of  replicate(10'000, dip(runif(8))))")
 @
 
-%% NOTE that there's another phenomenon I haven't seen before;
-%% particularly, if we use 100'000 replicates ....
-%--------------------
-% set.seed(11)
-% D11 <- replicate(100000, dip(runif(11)))
-% save(D11, file="/u/maechler/R/Pkgs/diptest/stuff/D11.rda")
-% hist(D11, breaks=128, main = "Histogram of  replicate(100'000, dip(runif(11)))")
-%--------------------
+Note that there is another phenomenon, in addition to the point mass at $1/(2n)$,
+particularly visible, if we use \emph{many} replicates,
+<<sim--n-eq-11, eval=FALSE>>=
+ set.seed(11)
+ n <- 11
+ B.s11 <- 500000
+ D11 <- replicate(B.s11, dip(runif(n)))
+<<2nd-small-sample-phenomen--n-eq-11, echo=false>>=
+if(file.exists(ff <- file.path(thisDir, "hist-D11.rda"))) {
+  load(ff)
+} else { ## takes a few minutes
+<<sim--n-eq-11>>
+  hD11 <- hist(D11, breaks=1e-6+(63:298)/(2*11*64), plot=FALSE)
+  save(hD11, n, B.s11, file= ff)
+}
+<<2nd-small-sample-phenomen--n-eq-11, echo=false, fig=true>>=
+B.str <- format(B.s11, sci=FALSE, big.mark="'")
+plot(hD11, main = "",
+     ## main = sprintf("Histogram of  replicate(%s, dip(runif(%d)))", B.str, n),
+     border=NA, col="dark gray",
+     xlab = substitute("Dip" ~~ D[.N.](U(group("[",list(0,1),"]"))), list(.N. = n)))
+title(xlab= substitute(B == .B.SIM. ~ "replicates", list(.B.SIM. = B.str)),
+      adj = .88)
+lcol <- adjustcolor("orange4", 0.4)
+abline(v = (1:3)/(2*n), col=lcol, lty=3, lwd=2)
+axis(1, pos=0, at = (1:3)/(2*n),
+     labels = expression(1/22, 2/22, 3/22), col=lcol, col.axis=lcol)
+@
+
 FIXME:\\
-use ../../stuff/sim-minProb.R
-and ../../stuff/minProb-anal.R
+use \file{../../stuff/sim-minProb.R} \\
+and \file{../../stuff/minProb-anal.R}
 
 Further, it can be seen that the \emph{maximal} dip statistic
-is $\frac 1 4 = 0.25$ (for even $n$) and this upper bound can be reached
-simply using the the data $(0,0\,dots,0, \; 1, 1,\dots,1)$, a bi-point mass
-with the mass at each point.
+is $\frac 1 4 = 0.25$ and this upper bound can be reached simply (for even
+$n$) using the the data $(0,0,\dots,0, \; 1, 1,\dots,1)$, a bi-point mass
+with equal mass at both points.
 
 \section{P-values for the Dip Test}
 \label{sec:Pvals}
+Note that it is not obvious how to compute P-values for ``the dip test'',
+as that means determining the distribution of the test statistic, i.e.,
+$D_n$ under the null hypothesis, but a natural null,
+$H_o: F \in \{F \mathrm{cadlag} \mid f := \frac d{dx} F is unimodal \}$
+is too large.  Hartigans'(1985) argued for using the uniform $U[0,1]$ i.e.,
+$F'(x) = f(x)= \mathbf{1}_{[0,1]}(x) = [0 \le x \le 1]$ (Iverson bracket)
+instead, even though they showed that it is not quite the ``least
+favorable'' one.
+Following Hartigans', we will define the P-value of an observed $d_n$ as
+\begin{equation}
+  \label{eq:Pval}
+  P_{d_n} := \PR{D_n \ge d_n} := \PR{\mathrm{dip}(U_1,\dots,U_n) \ge d_n}, \ \
+  \mathrm{where} \ U_i \sim U[0,1], \ \, \iid
+\end{equation}
 
 \subsection{Interpolating the Dip Table}
 \label{sec:interpol}
@@ -248,6 +295,7 @@ $ \lim_{n\to\infty}\sqrt{n} \; D_n \isD  D_\infty$,
 it is makes sense to consider the ``$\sqrt{n} D_n$''--scale,
 even for finite $n$ values:
 <<sqrt-n-qdip,fig=true>>=
+data(qDiptab)
 dnqd <- dimnames(qDiptab)
 (nn. <- as.integer(dnqd[["n"]]))
 matplot(nn., qDiptab*sqrt(nn.), type ="o", pch=1, cex = 0.4,
@@ -265,6 +313,7 @@ points(n, sqrt(n)*D, pch=13, cex=2, col= adjustcolor("blue2",.5), lwd=2)
 ## a simulated (approximate) P-value for D  is
 mean(D <= replicate(10000, dip(runif(n)))) ## ~ 0.002
 @
+
 but we can use our table to compute a deterministic (but still approximate,
 as the table is from simulation too) P-value:
 %%% ------------------------------- =====
