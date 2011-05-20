@@ -10,8 +10,9 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 }
 \arguments{
   \item{x}{numeric; the data.}
-  \item{full.result}{logical; if \code{TRUE} returns the full result
-    list, see below.}
+  \item{full.result}{logical or string; if \code{TRUE} returns the full result
+    list, see below.}%% FIXME "all" returns even more !!
+
   \item{min.is.0}{logical indicating if the \bold{min}imal value of the
     dip statistic \eqn{D_n}{Dn} can be zero or not.  Arguably should be
     set to \code{TRUE} for internal consistency reasons, but is false by
@@ -76,15 +77,18 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 \author{Martin Maechler \email{maechler@stat.math.ethz.ch}, based on
   earlier code from Dario Ringach \email{dario@wotan.cns.nyu.edu}
 }
-\seealso{\code{\link{isoreg}} for isotonic regression.
-  \code{\link{qDiptab}} on how to get approximate P-values.
+\seealso{
+  \code{\link{dip.test}} to compute the dip \emph{and} perform the unimodality test,
+  based on P-values, interpolated from \code{\link{qDiptab}};
+  \code{\link{isoreg}} for isotonic regression.
 }
 \examples{
 data(statfaculty)
 plot(density(statfaculty))
 rug(statfaculty, col="midnight blue"); abline(h=0, col="gray")
 dip(statfaculty)
-(dip(statfaculty, full = TRUE, debug = TRUE))
+(dS <- dip(statfaculty, full = TRUE, debug = TRUE))
+plot(dS, do.points=FALSE)
 
 data(faithful)
 fE <- faithful$eruptions
