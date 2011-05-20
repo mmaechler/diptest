@@ -21,10 +21,10 @@ if(!dev.interactive(orNone=TRUE)) pdf("ex1.pdf")
 par(mfrow = 2:1, mar = .1+c(3,4,2,1), mgp=c(1.5,.6,0), oma = c(0,0,2.1,0))
 #
 plot(d1)
-abline(v=-1:7, h = seq(0,1,by=0.2), lty=2, col = "gray")
+abline(v=-1:7, h = seq(0,1,by=0.2), lty="83", col = "gray")
 #
 plot(d2)
-abline(v=-1:7, h = seq(0,1,by=0.2), lty=2, col = "gray")
+abline(v=-1:7, h = seq(0,1,by=0.2), lty="83", col = "gray")
 #
 ## "title" only now
 mtext("dip() problem with 'mirror x'", side=3, line = 0.8,
@@ -41,11 +41,11 @@ cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
 
 data(statfaculty)
 
-str(dip(statfaculty, full = TRUE, debug = TRUE), vec.len = 8)
+str(dip(statfaculty, full = "all", debug = 3), vec.len = 8)
 
 data(faithful)
 fE <- faithful$eruptions
-str(dip(fE, full = TRUE, debug = 2),
+str(dip(fE, full = "all", debug = 3),
     vec.len= 8)
 
 data(precip)
