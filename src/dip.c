@@ -37,7 +37,7 @@
    1)	July 30 1994 : For unimodal data, gave "infinite loop"  (end of code)
    2)	Oct  31 2003 : Yong Lu <lyongu+@cs.cmu.edu> : ")" typo in Fortran
                        gave wrong result (larger dip than possible) in some cases
-   $Id: dip.c,v 1.22 2011/05/17 17:24:20 maechler Exp $
+   $Id: dip.c,v 1.23 2011/05/18 12:35:26 maechler Exp $
 */
 
 #include <R.h>
@@ -55,7 +55,7 @@ void diptst(double *x, Sint *n_,
 
     /* Local variables */
     int mnj, mnmnj, mjk, mjmjk, ig, ih, iv, ix,  i, j, k;
-    double dip_l, dip_u, dipnew, d, dx;
+    double dip_l, dip_u, dipnew;
     int n = *n_;
 
     /* Parameter adjustments, so I can do "as with index 1" : x[1]..x[n] */
@@ -139,19 +139,28 @@ LOOP_Start:
     ih = l_lcm = i; // l_lcm == relevant_length(LCM)
     iv = 2; //  iv, ih  are counters for the concave majorant.
 
-    if(*debug)
-	Rprintf("'dip': LOOP-BEGIN: 2n*D= %-8.5g  [low,high] = [%3d,%3d]; l_lcm/gcm = (%2d,%2d)\n",
-		*dip, low,high, l_lcm,l_gcm);
-
+    if(*debug) {
+	Rprintf("'dip': LOOP-BEGIN: 2n*D= %-8.5g  [low,high] = [%3d,%3d]", *dip, low,high);
+	if(*debug >= 3) {
+	    Rprintf(" :\n gcm[1:%d] = ", l_gcm);
+	    for(i = 1; i <= l_gcm; i++) Rprintf("%d%s", gcm[i], (i < l_gcm)? ", " : "\n");
+	    Rprintf(" lcm[1:%d] = ", l_lcm);
+	    for(i = 1; i <= l_lcm; i++) Rprintf("%d%s", lcm[i], (i < l_lcm)? ", " : "\n");
+	} else { // debug <= 2 :
+	    Rprintf("; l_lcm/gcm = (%2d,%2d)\n", l_lcm,l_gcm);
+	}
+    }
 
 /*	Find the largest distance greater than 'DIP' between the GCM and
  *	the LCM from LOW to HIGH. */
 
-    d = 0.;
+    // FIXME: <Rconfig.h>  should provide LDOUBLE or something like it
+    long double d = 0.;// <<-- see if this makes 32-bit/64-bit difference go..
     if (l_gcm != 2 || l_lcm != 2) {
-	if(*debug) Rprintf("  while(gxm[.] != lcm[]) :%s",
+	if(*debug) Rprintf("  while(gcm[ix] != lcm[iv]) :%s",
 			   (*debug >= 2) ? "\n" : " ");
       do { /* gcm[ix] != lcm[iv]  (after first loop) */
+	  long double dx;
 	  int gcmix = gcm[ix],
 	      lcmiv = lcm[iv];
 	  if (gcmix > lcmiv) {
