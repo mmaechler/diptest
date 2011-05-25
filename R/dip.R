@@ -3,11 +3,17 @@
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
-###-- $Id: dip.R,v 1.10 2011/05/18 12:35:43 maechler Exp maechler $
+###-- $Id: dip.R,v 1.11 2011/05/20 14:58:30 maechler Exp maechler $
 
 dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 {
-    if(full.result) cl <- match.call()
+    allRes <- (!is.logical(rFull <- full.result))
+    if(allRes) {
+	if(full.result %in% c("all"))
+	    rFull <- TRUE
+	else stop(gettextf("'full.result' = \"%s\"' is not valid", full.result))
+    }
+    if(rFull) cl <- match.call()
 
     n <- as.integer(length(x))
     x <- sort(unname(x), method="quick")
@@ -27,17 +33,40 @@ dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 	    min.is.0 = min.is.0,
 	    debug = debug,
 	    DUP = FALSE,
-	    PACKAGE = "diptest")[if(full.result) TRUE else "dip"]
-    if(full.result) {
+	    PACKAGE = "diptest")[if(rFull) TRUE else "dip"]
+    if(rFull) {
 	l.GL <- r$lo.hi[3:4]
 	length(r$gcm) <- l.GL[1]
 	length(r$lcm) <- l.GL[2]
 	length(r$lo.hi) <- 2L
 	u <- x[r$lo.hi]
 	structure(class = "dip",
-		  c(list(call = cl), r, list(xl = u[1], xu = u[2])))
+		  c(list(call = cl), r,
+		    list(xl = u[1], xu = u[2], full.result=full.result),
+		    if(allRes) getCM(r$mn, r$mj, n)))
     }
     else r[[1]]
+}
+
+getCM <- function(mn, mj, n = length(mn)) {
+    stopifnot(length(mn) <= n, length(mj) <= n) # currently '=='...
+    ## First recover "the full GCM / LCM" - by repeating what happened in C
+    ## in the first "loop" :
+    low <- 1L ; high <- n
+    gcm <- lcm <- integer(n) # pre-allocate!  {maybe smaller ?}
+
+    ## Collect the change points for the GCM from HIGH to LOW. */
+    gcm[i <- 1L] <- high
+    while(gcm[i] > low)
+	gcm[(i <- i+1L)] <- mn[gcm[i]]
+    length(gcm) <- i
+
+    ## Collect the change points for the LCM from LOW to HIGH. */
+    lcm[i <- 1L] <- low
+    while(lcm[i] < high)
+	lcm[(i <- i+1L)] <- mj[lcm[i]]
+    length(lcm) <- i
+    list(GCM = gcm, LCM = lcm)
 }
 
 print.dip <- function(x, digits = getOption("digits"), ...)
@@ -52,24 +81,28 @@ print.dip <- function(x, digits = getOption("digits"), ...)
 	format(2*n* D, digits=digits),"/(2n)\n",
 	sprintf(" Modal interval [xL, xU] = [x[%d], x[%d]] = [%s, %s]\n",
 		lh[1], lh[2], xLU.c[1], xLU.c[2]),
-	sprintf(" GCM and LCM have %d and %d nodes inside [xL, xU], respectively.\n",
+	sprintf(" GCM and LCM have %d and %d nodes inside [xL, xU], respectively",
+                ## 3 5 7 9 1 3 5 7
 		length(x$gcm), length(x$lcm)),
+	if(x$full.result == "all")
+	sprintf(", and\n%17s %d and %d nodes in   [x_1, x_n].\n", "",
+		length(x$GCM), length(x$LCM)) else ".\n",
 	sep="")
     invisible(x)
 }
 
-aLine <- function(r.dip, lType = c("gcm","lcm"),
-		  type = "b", col="red3", lwd=1.5)
+aLine <- function(r.dip, lType = c("gcm","lcm","GCM","LCM"),
+		  type = "b", col="red3", lwd=1.5, ...)
 {
     lType <- match.arg(lType)
     stopifnot(is.numeric(x <- r.dip$x),
 	      is.integer(n <- r.dip$n),
 	      is.integer(i <- r.dip[[lType]]) # 'gcm' or 'lcm' or component
 	      )
-    e <- if(lType =="gcm") .01*min(diff(unique(x))) else 0
+    e <- if(lType %in% c("gcm","GCM")) .01*min(diff(unique(x))) else 0
     i <- i[i != 0]
     lines(x[i], ecdf(x)(x[i] - e),
-	  type=type, col=col, lwd=lwd)
+	  type=type, col=col, lwd=lwd, ...)
 }
 
 plot.dip <- function(x, do.points=(n < 20), ## <- plot.stepfun()
@@ -91,6 +124,11 @@ plot.dip <- function(x, do.points=(n < 20), ## <- plot.stepfun()
     title(tit, adj = 0, line = 1.25)
     aLine(x, "gcm", col=colG)
     aLine(x, "lcm", col=colL)
+    doCM.2 <- (x$full.result == "all")
+    if(doCM.2) {
+        aLine(x, "GCM", col=colG, lty=5)
+        aLine(x, "LCM", col=colL, lty=5)
+    }
     if(doModal) {
 	x12 <- x$x[lh]
 	abline(v= x12, col = colM, lty = 2)
@@ -99,10 +137,14 @@ plot.dip <- function(x, do.points=(n < 20), ## <- plot.stepfun()
 	     tick=FALSE, col.axis = colM)
 	par(op)
     }
-    if(doLegend)
+    if(doLegend) {
+	txt <- c("greatest convex minorant GCM",
+### make sure have *no* [TAB] in next string !
+		 "least     concave majorant LCM")
+	t1 <- paste(txt," in [xL, xU]")
 	legend("topleft", bty = "n",
-	       c("greatest convex minorant GCM",
-		 "least concave majorant    LCM"),
-	       col =c(colG, colL), lty=1, lwd=1.5)
+	       if(doCM.2) c(t1, txt) else t1,
+	       lwd=1.5, col = c(colG, colL), lty= if(doCM.2) c(1,1,5,5) else 1)
+    }
     invisible()
 }
