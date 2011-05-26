@@ -5,7 +5,7 @@ Title: Hartigan's dip test statistic for unimodality - corrected code
 Description: Compute Hartigan's dip test statistic for unimodality
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 LazyData: no
-LazyData-no: because of deprecation message. Also use  R CMD build --no-resave-data
+LazyData-no: because of deprecation message.
 BuildResaveData: no
-Author: Martin Maechler (based on Fortran and S-plus from Dario Ringach, NYU.edu)
+Author: Martin Maechler (originally from Fortran and S-plus by Dario Ringach, NYU.edu)
 License: GPL (>= 2)
