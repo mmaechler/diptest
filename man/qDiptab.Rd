@@ -1,4 +1,4 @@
-\name{qDiptab}
+\name{qDiptab}-- $Id$
 \alias{qDiptab}
 \title{Table of Quantiles from a Large Simulation for Hartigan's Dip Test}
 \docType{data}
@@ -23,7 +23,10 @@
   \eqn{D_{[k]}} (from the \eqn{N+1} simulated values of
   \code{\link{dip}(U)}, where \code{U <- runif(15)}.
 }
-\seealso{\code{\link{dip}}, also for the references.}
+\seealso{\code{\link{dip}}, also for the references;
+  \code{\link{dip.test}()} which performs the hypothesis test, using
+  \code{qDtiptab} (and its null hypothesis of a uniform distribution).
+}
 \author{Martin Maechler \email{maechler@stat.math.ethz.ch}
 }
 \examples{
