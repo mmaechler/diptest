@@ -37,7 +37,7 @@
    1)	July 30 1994 : For unimodal data, gave "infinite loop"  (end of code)
    2)	Oct  31 2003 : Yong Lu <lyongu+@cs.cmu.edu> : ")" typo in Fortran
                        gave wrong result (larger dip than possible) in some cases
-   $Id: dip.c,v 1.23 2011/05/18 12:35:26 maechler Exp $
+   $Id: dip.c,v 1.24 2011/05/25 12:38:39 maechler Exp $
 */
 
 #include <R.h>
@@ -212,48 +212,60 @@ LOOP_Start:
 /*     Calculate the DIPs for the current LOW and HIGH. */
     if(*debug) Rprintf("  calculating dip ..");
 
-    /* The DIP for the convex minorant. */
+    int j_best, j_l = -1, j_u = -1;
 
+    /* The DIP for the convex minorant. */
     dip_l = 0.;
     for (j = ig; j < l_gcm; ++j) {
-	double temp = 1.;
-	int jb = gcm[j + 1], je = gcm[j];
+	double max_t = 1.;
+	int j_ = -1, jb = gcm[j + 1], je = gcm[j];
 	if (je - jb > 1 && x[je] != x[jb]) {
 	  double C = (je - jb) / (x[je] - x[jb]);
-	  for (int jr = jb; jr <= je; ++jr) {
-	    double t = (jr - jb + 1) - (x[jr] - x[jb]) * C;
-	    if (temp < t)
-		temp = t;
+	  for (int jj = jb; jj <= je; ++jj) {
+	    double t = (jj - jb + 1) - (x[jj] - x[jb]) * C;
+	    if (max_t < t) {
+		max_t = t; j_ = jj;
+	    }
 	  }
 	}
-	if (dip_l < temp)
-	    dip_l = temp;
+	if (dip_l < max_t) {
+	    dip_l = max_t; j_l = j_;
+	}
     }
 
     /* The DIP for the concave majorant. */
-
     dip_u = 0.;
-    for (k = ih; k < l_lcm; ++k) {
-	double temp = 1.;
-	int kb = lcm[k], ke = lcm[k + 1];
-	if (ke - kb > 1 && x[ke] != x[kb]) {
-	  double C = (ke - kb) / (x[ke] - x[kb]);
-	  for (int kr = kb; kr <= ke; ++kr) {
-	    double t = (x[kr] - x[kb]) * C - (kr - kb - 1);
-	    if (temp < t)
-		temp = t;
+    for (j = ih; j < l_lcm; ++j) {
+	double max_t = 1.;
+	int j_ = -1, jb = lcm[j], je = lcm[j + 1];
+	if (je - jb > 1 && x[je] != x[jb]) {
+	  double C = (je - jb) / (x[je] - x[jb]);
+	  for (int jj = jb; jj <= je; ++jj) {
+	    double t = (x[jj] - x[jb]) * C - (jj - jb - 1);
+	    if (max_t < t) {
+		max_t = t; j_ = jj;
+	    }
 	  }
 	}
-	if (dip_u < temp)
-	    dip_u = temp;
+	if (dip_u < max_t) {
+	    dip_u = max_t; j_u = j_;
+	}
     }
 
-    if(*debug) Rprintf(" (dip_l, dip_u) = (%g, %g)\n", dip_l, dip_u);
+    if(*debug) Rprintf(" (dip_l, dip_u) = (%g, %g)", dip_l, dip_u);
 
     /* Determine the current maximum. */
-    dipnew = (dip_u > dip_l) ? dip_u : dip_l;
-    if (*dip < dipnew)
+    if(dip_u > dip_l) {
+	dipnew = dip_u; j_best = j_u;
+    } else {
+	dipnew = dip_l; j_best = j_l;
+    }
+    if (*dip < dipnew) {
 	*dip = dipnew;
+	if(*debug)
+	    Rprintf(" -> new larger dip %g (j_best = %d)\n", dipnew, j_best);
+    }
+    else if(*debug) Rprintf("\n");
 
     /*--- The following if-clause is NECESSARY  (may loop infinitely otherwise)!
       --- Martin Maechler, Statistics, ETH Zurich, July 30 1994 ---------- */
