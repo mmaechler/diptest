@@ -1,4 +1,4 @@
-%\documentclass[article]{jss}
+%\documentclass[article]{jss}-- $Id$
 \documentclass[nojss,article]{jss}
 %              ----- for the package-vignette, don't use JSS logo, etc
 %
@@ -329,9 +329,6 @@ mean(D <= replicate(10000, dip(runif(n)))) ## ~ 0.002
 
 but we can use our table to compute a deterministic (but still approximate,
 as the table is from simulation too) P-value:
-%%% ------------------------------- =====
-%%% ------------------------------- FIXME  -- make this into a documented function!
-%%% ------------------------------- =====
 <<interpolate-dip-table>>=
 ## We are in this interval:
 n0 <- nn.[i.n <- findInterval(n, nn.)]
@@ -345,6 +342,20 @@ y.1 <- sqrt(n1)* qDiptab[i.n+1,]
                     xout = sqrt(n) * D)[["y"]])
 ## 0.018095
 @
+
+Finally, in May 2011, after several year of people asking for it,
+I have implemented a \code{dip.test} function which makes use of a ---
+somewhat more sophisticated --- interpolation scheme like the one above,
+to compute a $P$-value.
+As \code{qDiptab} has been based on $10^6$ samples, the interpolation
+yields accurate P-values, unless in very extreme cases.
+Here is the small ($n=63$) example from Hartigan$^2$,
+<<statfac-dip.test>>=
+data(statfaculty)
+dip.test(statfaculty)
+@
+where, from a P-value of 8.7\%, we'd conclude that there is not enough
+evidence against unimodality.
 
 \subsection{Asymptotic Dip Distribution}
 \label{sec:asymp}
