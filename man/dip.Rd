@@ -1,4 +1,4 @@
-\name{dip}
+\name{dip}-- $Id$
 \alias{dip}
 \title{Compute Hartigans' Dip Test Statistic for Unimodality}
 \description{
@@ -10,9 +10,9 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 }
 \arguments{
   \item{x}{numeric; the data.}
-  \item{full.result}{logical or string; if \code{TRUE} returns the full result
-    list, see below.}%% FIXME "all" returns even more !!
-
+  \item{full.result}{logical or string; \code{dip(., full.result=TRUE)} returns the full result
+    list; if \code{"all"} it additionally uses the \code{mn} and
+    \code{mj} components to compute the initial GCM and LCM, see below.}
   \item{min.is.0}{logical indicating if the \bold{min}imal value of the
     dip statistic \eqn{D_n}{Dn} can be zero or not.  Arguably should be
     set to \code{TRUE} for internal consistency reasons, but is false by
@@ -26,7 +26,7 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 }
 \value{
   depending on \code{full.result} either a number, the dip statistic, or
-  a list with components
+  an object of class \code{"dip"} which is a \code{\link{list}} with components
   \item{x}{the sorted \code{\link{unname}()}d data.}
   \item{n}{\code{length(x)}.}
   \item{dip}{the dip statistic}
@@ -36,6 +36,10 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
     \bold{m}inorant and the \bold{l}east \bold{c}oncave \bold{m}ajorant.}
   \item{mn, mj}{index vectors of length \code{n} for the GC minorant and
     the LC majorant respectively.}
+
+  For \dQuote{full} results of class \code{"dip"}, there are
+  \code{\link{print}} and \code{\link{plot}} methods, the latter with
+  its own \link[=plot.dip]{manual page}.
 }
 \note{
   For \eqn{n \le 3}{n <= 3} where \code{n <- length(x)}, the dip
@@ -88,7 +92,10 @@ plot(density(statfaculty))
 rug(statfaculty, col="midnight blue"); abline(h=0, col="gray")
 dip(statfaculty)
 (dS <- dip(statfaculty, full = TRUE, debug = TRUE))
-plot(dS, do.points=FALSE)
+plot(dS)
+## even more output -- + plot showing "global" GCM/LCM:
+(dS2 <- dip(statfaculty, full = "all", debug = 3))
+plot(dS2)
 
 data(faithful)
 fE <- faithful$eruptions
