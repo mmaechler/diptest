@@ -1,5 +1,5 @@
-\documentclass[article]{jss}
-%\documentclass[nojss,article]{jss}
+%\documentclass[article]{jss}
+\documentclass[nojss,article]{jss}
 %              ----- for the package-vignette, don't use JSS logo, etc
 %
 % \author{Martin Maechler\\ Seminar f\"ur Statistik \\ ETH Zurich, \ Switzerland
@@ -131,7 +131,7 @@
 options(SweaveHooks= list(fig=function() par(mar=c(5.1, 4.1, 1.1, 2.1))),
         width = 75,
         digits = 7, # <-- here, keep R's default!
-        prompt = "R> ",
+        prompt = "R> ", # <- "yuck!" - required by JSS
         continue=" ")
 set.seed(47)
 Sys.setenv(LANGUAGE = "en")
@@ -145,8 +145,7 @@ xtraDir <- if(Sys.getenv("USER") == "maechler")
 res1.file <- file.path(thisDir, "aggr_results.Rdata")
 
 <<diagnose-lib, echo=FALSE>>=
-if(Sys.getenv("USER") == "maechler")## just for "testing"
-  print( .libPaths() )
+if(nzchar(Sys.getenv("R_MM_PKG_CHECKING"))) print( .libPaths() )
 @
 \end{footnotesize}
 % \maketitle
@@ -183,21 +182,35 @@ A considerable part of this paper is devoted to explore the distribution of $D_\
 % ALGORITHM AS 217 APPL. STATIST. (1985) VOL.34, NO.3
 where the code was also made available on Statlib\footnote{Statlib is now a
   website, of course, \url{http://lib.stat.cmu.edu/}, but then was \emph{the} preferred way
-  for distributing algorithm for statistical computing, available years
+  for distributing algorithms for statistical computing, available years
   before the existence of the WWW, and entailing e-mail and (anonymous) FTP}
 
-- MM started in 1994, with S-plus code interfacing to Hartigan's Fortran
+On July 28, 1994, Dario Ringach, then at NY University, asked on Snews (the
+mailing list for S and S-plus users) about distributions and was helped by
+me and then about \texttt{dyn.load} problems, again helped by
+me. Subsequently he provided me with S-plus code which interfaced to
+(a \texttt{f2c}ed version of) Hartigan's Fortran code, for computing the dip statistic.
+and ended the (then private) e-mail with
+\begin{quotation}
+I am not going to have time to set this up for submission to StatLib.
+If you want to do it, please go ahead.
+
+Regards,
+Dario
+\end{quotation}
+
+
 
 - several important bug fixes;
   last one Oct./Nov.~2003
 
   However, the Fortran code file \url{http://lib.stat.cmu.edu/apstat/217},
-  was last changed {Thu 04 Aug 2005 03:43:28 PM CEST}
+  was last changed {Thu 04 Aug 2005 03:43:28 PM CEST}.
 
   We have some results of the dip.dist of \emph{before} the bug fix;
   notably the ``dip of the dip'' probabilities have changed considerably!!
 
-- see rcslog of ../../src/dip.c
+- see rcs log of ../../src/dip.c
 
 \section{21st Century Improvement of  Hartigan$^2$'s Table}
 
