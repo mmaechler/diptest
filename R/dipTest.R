@@ -13,7 +13,9 @@ dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
 			"with simulated p-value\n\t (based on", B, "replicates)")
 	P <- mean(D <= replicate(B, dip(runif(n))))
     } else {
-	data(qDiptab, package="diptest")## needed as long as we don't have LazyData
+	## Long "codetools-compatible" way of	data(qDiptab) :
+	qDiptab <- readRDS(system.file("extraData", "qDiptab.rds",
+				       package="diptest", mustWork=TRUE))
 	dn <- dimnames(qDiptab)
 	max.n <- max(nn <- as.integer(dn[["n"]]))
 	P.s <- as.numeric(noquote(dn[["Pr"]]))
@@ -36,6 +38,6 @@ dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
 	P <- 1 - approx(y.0 + f.n*(y.1 - y.0), rule = 1:2,
 			P.s, xout = sD)[["y"]]
     }
-    structure(list(statistic = c(D = D), p.value = P,
+    structure(list(statistic = c(D = D), p.value = P, nobs = n,
 		   method = method, data.name = DNAME), class = "htest")
 }
