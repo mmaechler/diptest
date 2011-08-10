@@ -1,4 +1,5 @@
-%\documentclass[article]{jss}-- $Id$
+%\documentclass[article]{jss}
+%% -- $Id: diptest-issues.Rnw,v 1.8 2011/08/10 14:02:43 maechler Exp maechler $
 \documentclass[nojss,article]{jss}
 %              ----- for the package-vignette, don't use JSS logo, etc
 %
