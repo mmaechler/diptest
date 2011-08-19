@@ -3,7 +3,7 @@
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
-###-- $Id: dip.R,v 1.11 2011/05/20 14:58:30 maechler Exp maechler $
+###-- $Id: dip.R,v 1.12 2011/05/25 12:37:45 maechler Exp maechler $
 
 dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 {
@@ -124,8 +124,7 @@ plot.dip <- function(x, do.points=(n < 20), ## <- plot.stepfun()
     title(tit, adj = 0, line = 1.25)
     aLine(x, "gcm", col=colG)
     aLine(x, "lcm", col=colL)
-    doCM.2 <- (x$full.result == "all")
-    if(doCM.2) {
+    if(doCM.2 <- (x$full.result == "all")) {
         aLine(x, "GCM", col=colG, lty=5)
         aLine(x, "LCM", col=colL, lty=5)
     }
@@ -133,7 +132,7 @@ plot.dip <- function(x, do.points=(n < 20), ## <- plot.stepfun()
 	x12 <- x$x[lh]
 	abline(v= x12, col = colM, lty = 2)
 	op <- par(mgp = c(3, 1/16, 0))# should not need on.exit(par(op)) here ..
-	axis(3, at=x12, label = expression(x[L], x[U]),
+	axis(3, at=x12, labels = expression(x[L], x[U]),
 	     tick=FALSE, col.axis = colM)
 	par(op)
     }
