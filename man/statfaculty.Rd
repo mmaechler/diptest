@@ -1,6 +1,7 @@
 \name{statfaculty}
 \alias{statfaculty}
-\alias{exHartigan}
+%- uncomment, once exHartigan is defunct:
+%- \alias{exHartigan}
 \title{Faculty Quality in Statistics Departments}
 \docType{data}
 \usage{
