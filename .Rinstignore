@@ -1,2 +1,2 @@
 inst/doc/Makefile
-inst/doc/*.sty
+inst/doc/.*sty
