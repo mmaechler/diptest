@@ -21,3 +21,16 @@ plot(density(sqrt(100) * dU100), lwd = 2, col=2,
 abline(h=0, col="dark gray", lty=3)
 
 round(1e4 * quantile(dU100, p = seq(0,1, by = 0.01), names = FALSE))
+
+##--- an extreme unimodal case -- i.e. very small dip():
+set.seed(60); x <- rexp(301,1)^3
+hist(x)
+(dt.x <- dip.test(x))
+(dt2 <- dip.test(x, simulate = TRUE))
+(dt3 <- dip.test(x, simulate = TRUE, B = 10000))
+stopifnot(dt.x$p.value == 1,## <- gave	NA  earlier
+	  dt2$p.value == 1,
+	  dt3$p.value == 1)
+
+
+cat('Time elapsed: ', proc.time() - .p0,'\n') # "stats"
