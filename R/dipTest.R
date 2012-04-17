@@ -18,7 +18,7 @@ dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
 				       package="diptest", mustWork=TRUE))
 	dn <- dimnames(qDiptab)
 	max.n <- max(nn <- as.integer(dn[["n"]]))
-	P.s <- as.numeric(noquote(dn[["Pr"]]))
+	P.s <- as.numeric(dn[["Pr"]])
 
         if(n > max.n) { ## extrapolate, or rather just use the last n as == "asymptotic"
             message("n = ",n," > max_n{n in table} = ",max.n,
@@ -35,8 +35,8 @@ dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
         y.0 <- sqrt(n0)* qDiptab[i.n, ]
 	y.1 <- sqrt(n1)* qDiptab[i2 , ]
         sD  <- sqrt(n) * D
-	P <- 1 - approx(y.0 + f.n*(y.1 - y.0), rule = 1:2,
-			P.s, xout = sD)[["y"]]
+	P <- 1 - approx(y.0 + f.n*(y.1 - y.0), P.s, rule = 2,# <- [min, max]
+			xout = sD)[["y"]]
     }
     structure(list(statistic = c(D = D), p.value = P, nobs = n,
 		   method = method, data.name = DNAME), class = "htest")
