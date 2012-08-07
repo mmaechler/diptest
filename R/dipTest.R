@@ -45,5 +45,6 @@ dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
 			xout = sD)[["y"]]
     }
     structure(list(statistic = c(D = D), p.value = P, nobs = n,
+		   alternative = "non-unimodal, i.e., at least bimodal",
 		   method = method, data.name = DNAME), class = "htest")
 }
