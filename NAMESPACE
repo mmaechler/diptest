@@ -1,4 +1,4 @@
-useDynLib(diptest)
+useDynLib(diptest, .registration=TRUE)# <--> src/dip.c 2nd part
 
 export(dip)
 export(dip.test)
