@@ -37,26 +37,31 @@
    1)	July 30 1994 : For unimodal data, gave "infinite loop"  (end of code)
    2)	Oct  31 2003 : Yong Lu <lyongu+@cs.cmu.edu> : ")" typo in Fortran
                        gave wrong result (larger dip than possible) in some cases
-   $Id: dip.c,v 1.24 2011/05/25 12:38:39 maechler Exp $
+   $Id: dip.c,v 1.25 2011/08/10 14:02:00 maechler Exp $
 */
 
 #include <R.h>
 
+// for the "registration part":
+#include <Rinternals.h>
+
+#include <R_ext/Rdynload.h>
+
+
 /* Subroutine */
-void diptst(double *x, Sint *n_,
-	    double *dip, Sint *lo_hi, Sint *ifault,
-	    Sint *gcm, Sint *lcm, Sint *mn, Sint *mj,
-	    Sint *min_is_0, Sint *debug)
+void diptst(const double x[], const int *n_,
+	    double *dip, int *lo_hi, int *ifault,
+	    int *gcm, int *lcm, int *mn, int *mj,
+	    const int *min_is_0, const int *debug)
 {
 #define low   lo_hi[0]
 #define high  lo_hi[1]
 #define l_gcm lo_hi[2]
 #define l_lcm lo_hi[3]
 
-    /* Local variables */
+    const int n = *n_;
     int mnj, mnmnj, mjk, mjmjk, ig, ih, iv, ix,  i, j, k;
     double dip_l, dip_u, dipnew;
-    int n = *n_;
 
     /* Parameter adjustments, so I can do "as with index 1" : x[1]..x[n] */
     --mj;    --mn;
@@ -82,7 +87,7 @@ void diptst(double *x, Sint *n_,
     low = 1;	high = n; /*-- IDEA:  *xl = x[low];    *xu = x[high]; --*/
 
 /* M.Maechler -- speedup: it saves many divisions by n when we just work with
- * (n * dip) everywhere but the very end! */
+ * (2n * dip) everywhere but the very end! */
     *dip = (*min_is_0) ? 0. : 1.;
     if (n < 2 || x[n] == x[1])		goto L_END;
 
@@ -168,7 +173,7 @@ LOOP_Start:
 	       * calculate the distance here. */
 	      int gcmi1 = gcm[ix + 1];
 	      dx = (lcmiv - gcmi1 + 1) -
-		  (x[lcmiv] - x[gcmi1]) * (gcmix - gcmi1)/(x[gcmix] - x[gcmi1]);
+		  ((long double) x[lcmiv] - x[gcmi1]) * (gcmix - gcmi1)/(x[gcmix] - x[gcmi1]);
 	      ++iv;
 	      if (dx >= d) {
 		  d = dx;
@@ -182,8 +187,8 @@ LOOP_Start:
 	       * calculate the distance here. */
 	      int lcmiv1 = lcm[iv - 1];
 /* Fix by Yong Lu {symmetric to above!}; original Fortran: only ")" misplaced! :*/
-	      dx = (x[gcmix] - x[lcmiv1]) * (lcmiv - lcmiv1) /
-		   (x[lcmiv] - x[lcmiv1])- (gcmix - lcmiv1 - 1);
+	      dx = ((long double)x[gcmix] - x[lcmiv1]) * (lcmiv - lcmiv1) /
+		  (x[lcmiv] - x[lcmiv1])- (gcmix - lcmiv1 - 1);
 	      --ix;
 	      if (dx >= d) {
 		  d = dx;
@@ -204,7 +209,7 @@ LOOP_Start:
     else { /* l_gcm or l_lcm == 2 */
 	d = (*min_is_0) ? 0. : 1.;
 	if(*debug)
-	    Rprintf("  ** (l_lcm,l_gcm) = (%d,%d) ==> d := %g\n", l_lcm, l_gcm, d);
+	    Rprintf("  ** (l_lcm,l_gcm) = (%d,%d) ==> d := %g\n", l_lcm, l_gcm, (double)d);
     }
 
     if (d < *dip)	goto L_END;
@@ -288,3 +293,48 @@ L_END:
 } /* diptst */
 #undef low
 #undef high
+
+//----------------- Registration <==> ../NAMESPACE
+#define CDEF(name)  {#name, (DL_FUNC) &name, sizeof(name ## _t)/sizeof(name ## _t[0]), name ##_t}
+
+#define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
+
+
+// void diptst(double *x, int *n_,
+// 	    double *dip, int *lo_hi, int *ifault,
+// 	    int *gcm, int *lcm, int *mn, int *mj,
+// 	    int *min_is_0, int *debug)
+static R_NativePrimitiveArgType diptst_t[] = {
+    REALSXP, INTSXP, /* dip: */ REALSXP, INTSXP, INTSXP,
+    /* gcm: */ INTSXP, INTSXP,  INTSXP, INTSXP,
+    /* min_is_0:*/ LGLSXP, INTSXP
+};
+
+
+static const R_CMethodDef CEntries[]  = {
+    CDEF(diptst),
+    {NULL, NULL, 0}
+};
+
+/* static R_CallMethodDef CallEntries[] = { */
+/*     CALLDEF(sinc_c, 1), */
+
+/*     {NULL, NULL, 0} */
+/* }; */
+
+/**
+ * register routines
+ * @param dll pointer
+ * @return none
+ * @author Martin Maechler
+ */
+void
+#ifdef HAVE_VISIBILITY_ATTRIBUTE
+__attribute__ ((visibility ("default")))
+#endif
+R_init_diptest(DllInfo *dll)
+{
+    R_registerRoutines(dll, CEntries, NULL, NULL, NULL);
+    /* R_registerRoutines(dll, CEntries, CallEntries, NULL, NULL); */
+    R_useDynamicSymbols(dll, FALSE);
+}
