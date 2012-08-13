@@ -3,7 +3,7 @@
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
-###-- $Id: dip.R,v 1.12 2011/05/25 12:37:45 maechler Exp maechler $
+###-- $Id: dip.R,v 1.13 2011/08/19 08:04:35 maechler Exp maechler $
 
 dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 {
@@ -15,12 +15,14 @@ dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
     }
     if(rFull) cl <- match.call()
 
+    x <- unname(x)# "duplicates"
+    if(is.unsorted(x))
+	x <- sort(x, method="quick")
     n <- as.integer(length(x))
-    x <- sort(unname(x), method="quick")
     ## be careful to "duplicate" (as have DUP=FALSE):
     min.is.0 <- as.logical(min.is.0)
     debug <- as.integer(debug)		# FALSE/TRUE or 2, 3, ...
-    r <- .C("diptst",
+    r <- .C(diptst,
 	    x	= as.double(x),
 	    n	= n,
 	    dip = double(1),
@@ -32,8 +34,7 @@ dip <- function(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
 	    mj	=   integer(n),
 	    min.is.0 = min.is.0,
 	    debug = debug,
-	    DUP = FALSE,
-	    PACKAGE = "diptest")[if(rFull) TRUE else "dip"]
+	    DUP = FALSE)[if(rFull) TRUE else "dip"]
     if(rFull) {
 	l.GL <- r$lo.hi[3:4]
 	length(r$gcm) <- l.GL[1]
