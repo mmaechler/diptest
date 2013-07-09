@@ -1,9 +1,10 @@
 ##' also called from ../data/qDiptab.R :
-rdRDS <- function(..., package = "diptest") {
-    if(getRversion() < "2.13.0")
-	.readRDS(system.file(..., package=package))
-    else readRDS(system.file(..., package=package, mustWork=TRUE))
-}
+if(getRversion() < "2.13.0") {
+   rdRDS <- function(..., package = "diptest")
+    .readRDS(system.file(..., package=package))
+} else
+   rdRDS <- function(..., package = "diptest")
+    readRDS(system.file(..., package=package, mustWork=TRUE))
 
 dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
 {
