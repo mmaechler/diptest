@@ -13,7 +13,7 @@ dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
     stopifnot(is.numeric(x))
     n <- length(x) # *is* integer
     D <- dip(x)
-    method <- "Hartigans' dip test for unimodality"
+    method <- "Hartigans' dip test for unimodality / multimodality"
     if(n <= 3) {
 	P <- 1
     } else if(simulate.p.value) {
