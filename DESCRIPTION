@@ -1,10 +1,10 @@
 Package: diptest
-Version: 0.75-5
-Date: 2013-07-09
+Version: 0.75-6
+Date: 2014-07-29
 Title: Hartigan's dip test statistic for unimodality - corrected code
-Description: Compute Hartigan's dip test statistic for unimodality
+Description: Compute Hartigan's dip test statistic for unimodality /
+ multimodality and provide a test with simulation based p-values.
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
-LazyData: no
 BuildResaveData: no
 Author: Martin Maechler (originally from Fortran and S-plus by Dario Ringach, NYU.edu)
 License: GPL (>= 2)
