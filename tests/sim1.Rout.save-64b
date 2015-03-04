@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2014-11-22 r67037) -- "Unsuffered Consequences"
-Copyright (C) 2014 The R Foundation for Statistical Computing
+R Under development (unstable) (2015-03-03 r67931) -- "Unsuffered Consequences"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -28,7 +28,7 @@ Type 'q()' to quit R.
 > .p0 <- proc.time()
 > dU100 <- replicate(N.sim, dip(runif(100)))
 > cat('Time elapsed: ', (p1 <- proc.time()) - .p0,'\n'); .p0 <- p1
-Time elapsed:  0.629 0.002 0.63 0 0 
+Time elapsed:  0.512 0.085 0.597 0 0 
 > ## Lynne (2003: P IV, 1.6 GHz): ~7   s
 > ## 2010 (AMD Phenom II X4 925):  1.3 s
 > 
@@ -57,7 +57,7 @@ Time elapsed:  0.629 0.002 0.63 0 0
 	Hartigans' dip test for unimodality / multimodality
 
 data:  x
-D = 0.0073, p-value = 1
+D = 0.0072617, p-value = 1
 alternative hypothesis: non-unimodal, i.e., at least bimodal
 
 > (dt2 <- dip.test(x, simulate = TRUE))
@@ -66,7 +66,7 @@ alternative hypothesis: non-unimodal, i.e., at least bimodal
 	p-value (based on 2000 replicates)
 
 data:  x
-D = 0.0073, p-value = 1
+D = 0.0072617, p-value = 1
 alternative hypothesis: non-unimodal, i.e., at least bimodal
 
 > (dt3 <- dip.test(x, simulate = TRUE, B = 10000))
@@ -75,7 +75,7 @@ alternative hypothesis: non-unimodal, i.e., at least bimodal
 	p-value (based on 10000 replicates)
 
 data:  x
-D = 0.0073, p-value = 1
+D = 0.0072617, p-value = 1
 alternative hypothesis: non-unimodal, i.e., at least bimodal
 
 > stopifnot(dt.x$p.value == 1,## <- gave	NA  earlier
@@ -84,8 +84,8 @@ alternative hypothesis: non-unimodal, i.e., at least bimodal
 > 
 > 
 > cat('Time elapsed: ', proc.time() - .p0,'\n') # "stats"
-Time elapsed:  1.143 0.003 1.156 0 0 
+Time elapsed:  1.136 0.018 1.158 0 0 
 > 
 > proc.time()
    user  system elapsed 
-  1.909   0.022   1.990 
+  1.765   0.129   1.935 
