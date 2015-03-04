@@ -1,7 +1,6 @@
 
-R version 2.15.1 Patched (2012-08-11 r60235) -- "Roasted Marshmallows"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R Under development (unstable) (2015-03-03 r67931) -- "Unsuffered Consequences"
+Copyright (C) 2015 The R Foundation for Statistical Computing
 Platform: x86_64-unknown-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -142,7 +141,7 @@ List of 15
  $ full.result: logi TRUE
  - attr(*, "class")= chr "dip"
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  0.363 0.043 0.466 0 0 
+Time elapsed:  0.184 0.023 0.252 0 0.003 
 > 
 > ## Real data examples :
 > 
@@ -282,17 +281,19 @@ List of 15
  $ mj         : int [1:70] 2 4 4 64 55 10 10 10 10 55 ...
  $ min.is.0   : logi FALSE
  $ debug      : int 1
- $ xl         : num 35.9
- $ xu         : num 43.4
+ $ xl         : Named num 35.9
+  ..- attr(*, "names")= chr "Dallas"
+ $ xu         : Named num 43.4
+  ..- attr(*, "names")= chr "Hartford"
  $ full.result: logi TRUE
  - attr(*, "class")= chr "dip"
 > 
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  0.065 0.005 0.088 0 0 
+Time elapsed:  0.034 0.005 0.052 0 0 
 > 
 > if(!interactive()) warnings()
 NULL
 > 
 > proc.time()
    user  system elapsed 
-  0.428   0.049   0.554 
+  0.218   0.031   0.304 
