@@ -3,7 +3,7 @@
 \title{Hartigans' Dip Test for Unimodality}
 \description{
   Compute Hartigans' dip statistic \eqn{D_n}{Dn}, and
-  its P-value for the test for unimodality, by interpolating
+  its p-value for the test for unimodality, by interpolating
   tabulated quantiles of \eqn{\sqrt{n} D_n}{sqrt(n) * Dn}.
 
   For \eqn{X_i \sim F, i.i.d.}{X_i ~ F, i.i.d},
@@ -53,7 +53,7 @@ dip.test(x, simulate.p.value = FALSE, B = 2000)
 }
 \examples{
 ## a first non-trivial case
-(d.t <- dip.test(c(0,0, 1,1))) # "perfect bi-modal for n=4" --> P-value = 0
+(d.t <- dip.test(c(0,0, 1,1))) # "perfect bi-modal for n=4" --> p-value = 0
 stopifnot(d.t$p.value == 0)
 
 data(statfaculty)
