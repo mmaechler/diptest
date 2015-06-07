@@ -1,0 +1,10 @@
+stuff
+.*,v
+.*-ss
+tests/.*64b
+tests/.*32b
+vignettes/auto
+inst/doc/auto
+vignettes/.*\.(tex|toc|aux|log|bbl|blg|out)
+inst/doc/.*\.(tex|toc|aux|log|bbl|blg|out)
+inst/doc/jss.*
