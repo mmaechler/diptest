@@ -1,6 +1,7 @@
 \name{dip.test}
-\alias{dip.test}
 \title{Hartigans' Dip Test for Unimodality}
+\alias{dip.test}
+\concept{multimodality}
 \description{
   Compute Hartigans' dip statistic \eqn{D_n}{Dn}, and
   its p-value for the test for unimodality, by interpolating
