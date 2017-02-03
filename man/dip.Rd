@@ -1,4 +1,4 @@
-\name{dip}-- $Id$
+\name{dip}
 \alias{dip}
 \title{Compute Hartigans' Dip Test Statistic for Unimodality}
 \description{
@@ -78,8 +78,13 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
   The Dip Test of Unimodality;
   \emph{Annals of Statistics} \bold{13}, 70--84.
 }
-\author{Martin Maechler \email{maechler@stat.math.ethz.ch}, based on
-  earlier code from Dario Ringach \email{dario@wotan.cns.nyu.edu}
+\author{Martin Maechler \email{maechler@stat.math.ethz.ch}, 1994,
+  based on S (S-PLUS) and C code donated from Dario Ringach
+  \email{dario@wotan.cns.nyu.edu} who had applied \command{f2c} on the
+  original Fortran code available from Statlib.
+
+  In Aug.1993, recreated and improved Hartigans' "P-value" table, which
+  later became \code{\link{qDiptab}}.
 }
 \seealso{
   \code{\link{dip.test}} to compute the dip \emph{and} perform the unimodality test,
