@@ -1,5 +1,14 @@
 useDynLib(diptest, .registration=TRUE)# <--> src/dip.c 2nd part
 
+importFrom("graphics",
+           abline, axis,
+           legend, lines,
+           par,
+           title)
+
+importFrom("stats",
+           approx, complete.cases, ecdf, runif)
+
 export(dip)
 export(dip.test)
 ## export(aLine, getCM)
