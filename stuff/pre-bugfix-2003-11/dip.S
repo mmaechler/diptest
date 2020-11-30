@@ -3,14 +3,22 @@
 ### Beginning:	Dario Ringach <dario@wotan.cns.nyu.edu>
 ### Rest:	Martin Maechler <maechler@stat.math.ethz.ch>
 
-###-- $Id: dip.S,v 1.3 1994/07/29 08:48:30 maechler Exp $
+###--- 1st page of this file should be  source(.)able !! -----------
 
-hartigan.data <- scan()
- 30 33 35 36 37 37 39 39 39 39 39 40 40 40 40 41 42 43 43 43 44 44 45 45 46
- 46 47 47 48 48 48 49 50 50 51 52 52 53 53 53 53 53 54 54 57 57 59 60 60 60
- 61 61 61 61 62 62 62 62 63 66 70 72 72
+if(!interactive()) {
+  options(echo = T) #-- when being run as batch [FAILS for source() !!]
+  print(date())
+}
 
-dip <- function(x, full.result = FALSE)
+
+DIP.dir <- getenv("PWD")
+
+hartigan.data <-
+  c(30,33,35,36,37,37,39,39,39,39,39,40,40,40,40,41,42,43,43,43,44,44,45,45,46,
+    46,47,47,48,48,48,49,50,50,51,52,52,53,53,53,53,53,54,54,57,57,59,60,60,60,
+    61,61,61,61,62,62,62,62,63,66,70,72,72)
+
+dip <- function(x, full.result = FALSE, debug = F)
 {
   ## Purpose: Compute the "Dip test for unimodality" (statistic)
   ## -------------------------------------------------------------------------
@@ -19,11 +27,13 @@ dip <- function(x, full.result = FALSE)
   ## Author: Martin Maechler <maechler@stat.math.ethz.ch>, Jul 94
   ##      from 1st version of   Dario Ringach <dario@wotan.cns.nyu.edu>
   
-  if(!is.loaded(symbol.C("diptst"))) dyn.load2("dip.o")
+  if(!is.loaded(symbol.C("diptst"))) 
+    dyn.load(paste(DIP.dir,"dip.o", sep="/"))
 
   n <- length(x)
-  ii <- if(full.result) 1:10 else  "dip"
-  simplify <- function(lis) if(length(lis)==1) lis[[1]] else lis
+
+  ii <- if(full.result) 1:11 else  "dip"
+  simplify <- function(lis) if(length(lis)==1) as.single(lis[[1]]) else lis
   simplify(.C("diptst",
 	      x   = as.single(sort(x)),
 	      n   = as.integer(n),
@@ -34,7 +44,8 @@ dip <- function(x, full.result = FALSE)
 	      gcm =   integer(n),
 	      lcm =   integer(n),
 	      mn  =   integer(n),
-	      mj  =   integer(n))[ii])
+	      mj  =   integer(n),
+	     debug= as.integer(debug))[ii])
   ##-   if(z$ifault!=0)  #-- something not ok, but this is IMPOSSIBLE here
   ##-     stop(paste("Problem -- C 'message' : ifault = ", z$ifault))
 }
@@ -56,6 +67,8 @@ summary(dip.1.10)
 ##-  0.05   0.058 0.06027 0.06011 0.06231 0.06696
 ##-- ~~~~ EXAKT (9 times out of 200)
 
+
+
 cdf <- function(x, X=x)
 {
   ## Purpose: Empirical distribution function F_{X}(x)
@@ -65,14 +78,25 @@ cdf <- function(x, X=x)
   ## Author: Martin Maechler, Date: 28 Jul 94, 18:03
   apply(outer(X,x,"<="),2,sum) / length(X)
 }
-## For plotting,  plot.step(X)  is much better !
 
-
+p.cdf <- function(X, type='b',...)
+{
+  ## Purpose:  PLOT empirical distribution function
+  ## -------------------------------------------------------------------------
+  ## Arguments:
+  ## -------------------------------------------------------------------------
+  ## Author: Martin Maechler, Date: 30 Jul 94, 11:41
+  X _ sort(X)
+  plot(X, cdf(X), type=type, ...)
+}
 
-dip0 <- function(x)
+## NOTE: For plotting, Martin Maechler's   plot.step(X)  is MUCH better !
+
+
+dip0 <- function(x, debug=F)
 {
   ## Load in ANY case ! if(!is.loaded(symbol.C("diptst")))
-  dyn.load2("dip0.o", userlibs="-lf2c")
+  dyn.load(paste(DIP.dir,"dip0.o", sep="/"))
   n <- length(x)
   .C("diptst",
      as.single(sort(x)),
@@ -84,14 +108,19 @@ dip0 <- function(x)
     integer(n),
     integer(n),
     integer(n),
-    integer(n)) $ans
+    integer(n),
+     as.integer(debug)) $ans
 }
 dip0(hartigan.data) ##-> [1] 0.05952381
+
+## Load my current "diptst" C-symbol !
+dyn.load(paste(DIP.dir,"dip.o", sep="/"))
+
 
 dipF <- function(x)
 { 
   if(!is.loaded(symbol.For("diptst")))
-  dyn.load2("dipF.o")
+    dyn.load(paste(DIP.dir,"dipF.o", sep="/"))
   n <- length(x)
   .Fortran("diptst",
      as.single(sort(x)),
@@ -114,3 +143,30 @@ for(i in 1:100){x_runif(50); if(dip(x) != dipF(x)) { xx<<-x; stop("DIFFERENT")}}
 for(i in 1:100) { 
   x_c(rnorm(100), 5+ rnorm(20))
   if(dip(x) != dipF(x)) { xx<<-x; stop("DIFFERENT") } }
+
+
+##-- NOTE: for small 'n' (n=4,5, even 8, 10 (rarely!)) sometimes INFINITE loop!!
+
+###===> FIXED in big.c  !!
+
+x4.ok <- x4.bad <- NULL
+xx4_round(runif(4),3); cat(format(dipF(xx4))); x4.ok_cbind(x4.ok,xx4)
+##-- C-c (kill) the above line if running long;  then do
+x4.bad <- cbind(x4.bad, xx4, deparse.level=0)
+
+##-- After a while (MANUALLY !)
+dim(x4.bad) #  4 10
+dim(x4.ok)  #  4 34
+
+
+##-- n=10 even can be bad: 1st example:  1:10
+## 2nd example: 
+n_10; set.seed(99);for(i in 1:3635) x _ runif(n)
+x10.bad _ round(sort(x),4)
+dipF(round(x10.bad,3)) #-- .05 (minimal value)
+plot.step(x10.bad);  subtit(vcat(x10.bad,sep=",  "))
+
+u.dev.default() 
+nb_ncol(x4.bad); mult.fig(nb); for(i in 1:nb) plot.step(x4.bad[,i],cad.lag=F,main="")
+u.dev.default() 
+no_ncol(x4.ok);  mult.fig(no); for(i in 1:no) plot.step(x4.ok[,i],cad.lag=F,main="")

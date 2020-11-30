@@ -1,6 +1,7 @@
 \name{dip}
 \alias{dip}
 \title{Compute Hartigans' Dip Test Statistic for Unimodality}
+\concept{multimodality}
 \description{
   Computes Hartigans' dip test statistic for testing unimodality,
   and additionally the modal interval.
@@ -54,7 +55,7 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
   was not giving symmetric results for mirrored data (and was giving
   results of almost 1, and then found the reason, a misplaced \samp{")"}
   in the original Fortran code.  This bug has been corrected for diptest
-  version 0.25-0.
+  version 0.25-0 (Feb 13, 2004).
 
   Nick Cox (Durham Univ.) said (on March 20, 2008 on the Stata-list):\cr
   As it comes from a bimodal husband-wife collaboration, the name

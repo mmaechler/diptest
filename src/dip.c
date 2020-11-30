@@ -37,7 +37,6 @@
    1)	July 30 1994 : For unimodal data, gave "infinite loop"  (end of code)
    2)	Oct  31 2003 : Yong Lu <lyongu+@cs.cmu.edu> : ")" typo in Fortran
                        gave wrong result (larger dip than possible) in some cases
-   $Id: dip.c,v 1.25 2011/08/10 14:02:00 maechler Exp $
 */
 
 #include <R.h>

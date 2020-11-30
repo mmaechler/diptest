@@ -1,5 +1,5 @@
 %\documentclass[article]{jss}
-%% -- $Id: diptest-issues.Rnw,v 1.8 2011/08/10 14:02:43 maechler Exp maechler $
+%% -- $Id: diptest-issues.Rnw,v 1.9 2011/08/10 14:04:29 maechler Exp maechler $
 \documentclass[nojss,article]{jss}
 %              ----- for the package-vignette, don't use JSS logo, etc
 %
@@ -287,7 +287,7 @@ with equal mass at both points.
 
 \section{P-values for the Dip Test}
 \label{sec:Pvals}
-Note that it is not obvious how to compute P-values for ``the dip test'',
+Note that it is not obvious how to compute $p$-values for ``the dip test'',
 as that means determining the distribution of the test statistic, i.e.,
 $D_n$ under the null hypothesis, but a natural null,
 $H_o: F \in \{F \mathrm{cadlag} \mid f := \frac d{dx} F is unimodal \}$
@@ -295,7 +295,7 @@ is too large.  Hartigans'(1985) argued for using the uniform $U[0,1]$ i.e.,
 $F'(x) = f(x)= \mathbf{1}_{[0,1]}(x) = [0 \le x \le 1]$ (Iverson bracket)
 instead, even though they showed that it is not quite the ``least
 favorable'' one.
-Following Hartigans', we will define the P-value of an observed $d_n$ as
+Following Hartigans', we will define the $p$-value of an observed $d_n$ as
 \begin{equation}
   \label{eq:Pval}
   P_{d_n} := \PR{D_n \ge d_n} := \PR{\mathrm{dip}(U_1,\dots,U_n) \ge d_n}, \ \
@@ -324,12 +324,12 @@ P.p <- as.numeric(print(noquote(dnqd[["Pr"]])))
 D <- dip(x <- faithful$waiting)
 n <- length(x)
 points(n, sqrt(n)*D, pch=13, cex=2, col= adjustcolor("blue2",.5), lwd=2)
-## a simulated (approximate) P-value for D  is
+## a simulated (approximate) $p$-value for D  is
 mean(D <= replicate(10000, dip(runif(n)))) ## ~ 0.002
 @
 
 but we can use our table to compute a deterministic (but still approximate,
-as the table is from simulation too) P-value:
+as the table is from simulation too) $p$-value:
 <<interpolate-dip-table>>=
 ## We are in this interval:
 n0 <- nn.[i.n <- findInterval(n, nn.)]
@@ -344,18 +344,18 @@ y.1 <- sqrt(n1)* qDiptab[i.n+1,]
 ## 0.018095
 @
 
-Finally, in May 2011, after several year of people asking for it,
+Finally, in May 2011, after several years of people asking for it,
 I have implemented a \code{dip.test} function which makes use of a ---
 somewhat more sophisticated --- interpolation scheme like the one above,
-to compute a $P$-value.
+to compute a $p$-value.
 As \code{qDiptab} has been based on $10^6$ samples, the interpolation
-yields accurate P-values, unless in very extreme cases.
+yields accurate $p$-values, unless in very extreme cases.
 Here is the small ($n=63$) example from Hartigan$^2$,
 <<statfac-dip.test>>=
 data(statfaculty)
 dip.test(statfaculty)
 @
-where, from a P-value of 8.7\%, we'd conclude that there is not enough
+where, from a $p$-value of 8.7\%, we'd conclude that there is not enough
 evidence against unimodality.
 
 \subsection{Asymptotic Dip Distribution}
