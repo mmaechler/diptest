@@ -1,11 +1,12 @@
 Package: diptest
-Version: 0.75-7
-Date: 2015-06-07
+Version: 0.76-0
+Date: 2020-11-30
+Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
+Author: Martin Maechler (originally from Fortran and S-plus by Dario Ringach, NYU.edu)
 Title: Hartigan's Dip Test Statistic for Unimodality - Corrected
 Description: Compute Hartigan's dip test statistic for unimodality /
  multimodality and provide a test with simulation based p-values,  where
  the original public code has been corrected.
-Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
+Imports: graphics, stats
 BuildResaveData: no
-Author: Martin Maechler (originally from Fortran and S-plus by Dario Ringach, NYU.edu)
 License: GPL (>= 2)
