@@ -1,0 +1,35 @@
+From Werner Stuetzle's
+     "Stat 593 E, Cluster Analysis and Other Unsupervised Learning Methods, Spring 2003"
+
+--> http://www.stat.washington.edu/wxs/Stat593-s03/datasets.htm
+and http://www.stat.washington.edu/wxs/Stat593-s03/Datasets/olive.dat
+    http://www.stat.washington.edu/wxs/Stat593-s03/Datasets/olive.doc
+both files, dated  31-Mar-2003 16:46
+
+---- MM : I have constructed  ./olive.tab  which you can read into R with
+
+olives <-
+   read.table("/u/maechler/R/Pkgs/diptest/stuff/Stuetzle-stat593-S2003-olive.tab",
+              header=TRUE)
+
+## together with code in ./jeremy-unimodality.R :
+all.equal(unname(olives.CF[,-2]), unname(olives[,-2])) ## TRUE
+## but clearly, also the last three *Variable* names differ...  [aargh]
+
+--------------- this is olive.doc -------------------------------------------
+
+From @craft.clarkson.edu:hopkepk@craft.camp.clarkson.edu Tue Nov 17 10:23:51 1992
+Received: from omnigate.clarkson.edu by stat.rutgers.edu (5.59/SMI4.0/RU1.5/3.08)
+	id AA12876; Tue, 17 Nov 92 10:23:30 EST
+Received: from craft.clarkson.edu by omnigate.clarkson.edu id aa26582;
+          17 Nov 92 10:23 EST
+Received: by craft.camp.clarkson.edu (AIX 3.1/UCB 5.61/4.03)
+          id AA28251; Tue, 17 Nov 92 10:22:46 -0500
+Date: Tue, 17 Nov 92 10:22:46 -0500
+From: "Philip K. Hopke" <hopkepk@craft.camp.clarkson.edu>
+Message-Id: <9211171522.AA28251@craft.camp.clarkson.edu>
+To: dcook@stat.rutgers.edu
+Subject: try again
+Status: R
+
+ID Region Class palmitic palmitoleic stearic oleic linoleic eicosanoic linolenic eicosenoic

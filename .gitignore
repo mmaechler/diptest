@@ -1,0 +1,13 @@
+stuff/pre-bugfix-2003-11
+stuff/*.tex
+stuff/*.Rout*
+stuff/dip[0-9]*.rda
+inst/doc/diptest-issues*
+inst/doc/*.bib
+inst/doc/*.sty
+TAGS
+*~
+*,v
+*-ss
+vignettes/cache/*
+.Rhistory
