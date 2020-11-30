@@ -1,7 +1,11 @@
 o  The vignette inst/doc/diptest-issues.Rnw
-    (for 0.75-1, on CRAN, since 2011-08-10) is TERRIBLY outdated.
-   Notably it does not even mention the new  dip.test()  function
-	
+   has mentioned the "new" (May 2011)  dip.test() function;
+
+   Still have not finalized *analyzing* the simulations in ./stuff/
+
+o REALLY should move this to R-forge .. but I *want* the history
+  (so maybe do as with 'sfsmisc'  and go to git, because there I have tools that *work*
+   for the port)
 
 o  Consider an analogue qnormDiptab  which is constructed using
    rnorm(.) instead of runif(.) simulations
