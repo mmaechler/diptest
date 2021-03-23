@@ -3,9 +3,6 @@ o  The vignette inst/doc/diptest-issues.Rnw
 
    Still have not finalized *analyzing* the simulations in ./stuff/
 
-o REALLY should move this to R-forge .. but I *want* the history
-  (so maybe do as with 'sfsmisc'  and go to git, because there I have tools that *work*
-   for the port)
 
 o  Consider an analogue qnormDiptab  which is constructed using
    rnorm(.) instead of runif(.) simulations

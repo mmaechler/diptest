@@ -10,3 +10,5 @@ Description: Compute Hartigan's dip test statistic for unimodality /
 Imports: graphics, stats
 BuildResaveData: no
 License: GPL (>= 2)
+URL: https://github.com/mmaechler/diptest
+BugReports: https://github.com/mmaechler/diptest/issues
