@@ -4,7 +4,22 @@
 \title{News for \R Package \pkg{diptest}}
 \encoding{UTF-8}
 
-\section{CHANGES in diptest VERSION 0.75-7 (2015-06-07)}{
+\section{CHANGES in diptest VERSION 0.76-0 (2021-03-23)}{
+
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item add \file{README.Rd} mostly for github readers
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item Added Imports (to "base" packages where they were not checked previously) to \file{NAMESPACE}.
+      \item Using \file{NEWS.Rd} file more.
+    }
+  }
+}
+
+\section{CHANGES in diptest VERSION 0.75-7 (2015-06-07)}{% CRAN release
 
   \subsection{NEW FEATURES}{
     \itemize{
@@ -34,26 +49,25 @@
 \section{CHANGES in diptest VERSION 0.75-5 (2013-07-23)}{
   \subsection{NEW FEATURES}{
     \itemize{
-      \item .
+      \item add \file{NEWS.Rd} (albeit mostly empty)
     }
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item .
+      \item \code{rdRDS()} wrapper corrrectly tests for R 2.13.0
     }
   }
 }
 
 
+%% this is the *latest* entry  in  ../ChangeLog
 \section{CHANGES in diptest VERSION 0.75-4 (2012-08-13)}{
   \subsection{NEW FEATURES}{
     \itemize{
-      \item .
-    }
-  }
-  \subsection{BUG FIXES}{
-    \itemize{
-      \item .
+      \item Enable package for pre-R-2.13.x via \code{rdRDS()} wrapper
+
+      \item \code{dip.test()} now also returns an \code{alternative} component,
+      e.g. for printing.
     }
   }
 }
