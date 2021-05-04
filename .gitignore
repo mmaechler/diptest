@@ -1,7 +1,11 @@
+Archive*.txt
+diptest*.out
 stuff/pre-bugfix-2003-11
+stuff/*.out
 stuff/*.tex
 stuff/*.Rout*
 stuff/dip[0-9]*.rda
+stuff/dipSim*.rda
 inst/doc/diptest-issues*
 inst/doc/*.bib
 inst/doc/*.sty

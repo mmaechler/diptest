@@ -2,9 +2,8 @@
 #### ~~~~~~~~                  ~~~~~~~~~~~~~~~
 
 setwd("/u/maechler/R/Pkgs/diptest/stuff")
-load(file= "minProb.rda")
+(nMin <- readRDS(file= "minProb.rds"))
 Ns <- attr(nMin, "Ns")
-nMin
 nn <- as.integer(names(nMin))
 nMin[nMin > 0] ## now only goes up to n=13,  even for Ns == 500'000
 

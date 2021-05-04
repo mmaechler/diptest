@@ -1,7 +1,7 @@
 ####---- More  "full simulations" of the asymptotic limit:  sqrt(n) * D_n
 ####                                     ================
 
-setwd("/u/maechler/R/Pkgs/diptest/stuff")
+setwd("/u/maechler/R/Pkgs/diptest/stuff") ## will load all the LARGE   dip<n>k.rda files
 
 ## These all have  n.sim = 1000'001  samples of
 ## dip(runif(N)) for "large N"
@@ -10,14 +10,18 @@ N.k.set <- c(8,12,16,20,24,32,36,40)
 ## or automatically
 patt <- "^dip(.*)k\\.rda"
 N.k.set <- sort(as.integer(sub(patt, "\\1", list.files(pattern = patt))))
-## for now:
+## for now: drop 5
 if(5 %in% N.k.set) { N.k.set <- N.k.set[N.k.set != 5] }
+N.k.set
 
 dip.nm <- function(N.k, file=FALSE)
     paste("dip", N.k, if(file)"k.rda" else "k", sep='')
 for(N.k in N.k.set)
     load(dip.nm(print(N.k), file=TRUE))
 
+if(interactive()) # show more interesting table below
+invisible(lapply(dip.nm(N.k.set), function(nm) {cat(nm,": "); str(get(nm)) }))
+## all are vectors of length 1'000'001
 
 d.dip <- function(N.k, scaleUp = TRUE)
 {
@@ -35,6 +39,8 @@ Nk2char <- function(Nk) {
     .val
 }
 mFormat <- function(n) sub("([0-9]{3})$", "'\\1", format(n))
+
+if(!dev.interactive(orNone=TRUE)) pdf("asymp-distrib.pdf")
 
 names(N.k.set) <- paste(format(N.k.set), "'000", sep='')
 t(sums <- sapply(N.k.set, function(Nk) summary(d.dip(Nk))))

@@ -23,7 +23,7 @@ nMin <- sapply(nn, function(n)
 names(nMin) <- paste(nn)
 attr(nMin, "Ns") <- Ns
 ## nMin / Ns == pm(n), i.e. pm(nn)
-save(nMin, file= "minProb.rda")
+saveRDS(nMin, file= "minProb.rds")
 
 proc.time()
 sessionInfo()
