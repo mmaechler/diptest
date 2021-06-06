@@ -4,6 +4,19 @@
 \title{News for \R Package \pkg{diptest}}
 \encoding{UTF-8}
 
+\section{CHANGES in diptest VERSION 0.77-0 (2021-..-..)}{
+  \subsection{NEW FEATURES}{
+    \itemize{
+      \item (nil)
+    }
+  }
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item (nil)
+    }
+  }
+}
+
 \section{CHANGES in diptest VERSION 0.76-0 (2021-03-23)}{
 
   \subsection{NEW FEATURES}{

@@ -1,0 +1,1 @@
+pre-bugfix-2003-11/dipF-statlib_2005-08-04.f
