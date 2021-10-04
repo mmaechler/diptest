@@ -13,7 +13,7 @@ glm.n <- glm(cbind(nMin,Ns) ~ log(nn), family = binomial)
 summary(glm.n)
 ## ^^ shows that logistic link  &  log(nn)  was not good enough:
 
-glm.s <- glm(cbind(nMin,Ns) ~ sqrt(nn), family = binomial)
+glm.s <- glm(cbind(nMin,Ns) ~ sqrt(nn), family = binomial)# warning about prob in ~= {0, 1}
 summary(glm.s)
 glm.is <- glm(cbind(nMin,Ns) ~ I(nn^-0.5), family = binomial) #  "best"
 summary(glm.is)
@@ -61,6 +61,8 @@ text(nn, nMin, formatC(signif(nMin/Ns, 2)), adj = -0.2, cex = 0.8)
 ## it is only visible if you look very carefully :
 
 ##___________ No longer ____ after fixing the 2003-10  bug ______
+
+setwd("pre-bugfix-2003-11")
 
 ### for  n=5000 "5k":
 load("dip5k.rda")# d5k has 100'000 values dip(runif(5000))
