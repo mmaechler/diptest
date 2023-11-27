@@ -12,7 +12,7 @@
   }
   \subsection{BUG FIXES}{
     \itemize{
-      \item (nil)
+      \item C level format: s/\%ld/\%d/
     }
   }
 }

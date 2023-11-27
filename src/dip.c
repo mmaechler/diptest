@@ -275,7 +275,7 @@ LOOP_Start:
       --- Martin Maechler, Statistics, ETH Zurich, July 30 1994 ---------- */
     if (low == gcm[ig] && high == lcm[ih]) {
       if(*debug)
-	Rprintf("No improvement in  low = %ld  nor  high = %ld --> END\n",
+	Rprintf("No improvement in  low = %d  nor  high = %d --> END\n",
 		low, high);
     } else {
 	low  = gcm[ig];
