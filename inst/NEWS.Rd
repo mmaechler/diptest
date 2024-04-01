@@ -20,7 +20,7 @@
       \item (nil)
     }
   }
-  \bsection{BUG FIXES}{
+  \section{BUG FIXES}{
     \itemize{
       \item C level format: s/\%ld/\%d/
     }
