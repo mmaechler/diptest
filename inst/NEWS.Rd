@@ -15,12 +15,7 @@
 }
 
 \section{CHANGES in diptest VERSION 0.77-0 (2023-11-27)}{
-  \subsection{NEW FEATURES}{
-    \itemize{
-      \item (nil)
-    }
-  }
-  \section{BUG FIXES}{
+  \subsection{BUG FIXES}{
     \itemize{
       \item C level format: s/\%ld/\%d/
     }
