@@ -1,7 +1,7 @@
 Package: diptest
-Version: 0.77-0
-VersionNote: Last CRAN: 0.76-0 on 2021-05-04
-Date: 2023-11-27
+Version: 0.77-1
+VersionNote: Last CRAN: 0.77-0 on 2023-11-27
+Date: 2024-03-31
 Maintainer: Martin Maechler <maechler@stat.math.ethz.ch>
 Author: Martin Maechler (originally from Fortran and S-plus by Dario Ringach, NYU.edu)
 Title: Hartigan's Dip Test Statistic for Unimodality - Corrected

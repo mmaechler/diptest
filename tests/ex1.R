@@ -51,6 +51,14 @@ str(dip(fE, full = "all", debug = 3),
 data(precip)
 str(dip(precip, full = TRUE, debug = TRUE))
 
+## current qDiptab <--> n = 72'000 is "asymptotic" boundary
+set.seed(123); x <- rnorm(72000)
+dt72k <- dip.test(x)
+## gave error  in qDiptab[i2, ] : subscript out of bounds  -- in diptest <= 0.77-0
+stopifnot(all.equal(list(statistic = c(D = 0.0005171098381181), p.value = 1, nobs = 72000L),
+                    dt72k[c("statistic", "p.value", "nobs")], tolerance = 1e-13))
+
+
 cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
 
 if(!interactive()) warnings()

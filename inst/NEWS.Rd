@@ -4,13 +4,23 @@
 \title{News for \R Package \pkg{diptest}}
 \encoding{UTF-8}
 
-\section{CHANGES in diptest VERSION 0.77-0 (2021-..-..)}{
+\section{CHANGES in diptest VERSION 0.77-1 (2024-03-31)}{
+  \subsection{BUG FIXES}{
+    \itemize{
+      \item \code{diptest(x72000, *)} for \code{length(x) == 72000} now
+      works correctly (with a \code{warning} about being asymptotic),
+      thanks to William Davis, UC Berkeley.
+    }
+  }
+}
+
+\section{CHANGES in diptest VERSION 0.77-0 (2023-11-27)}{
   \subsection{NEW FEATURES}{
     \itemize{
       \item (nil)
     }
   }
-  \subsection{BUG FIXES}{
+  \bsection{BUG FIXES}{
     \itemize{
       \item C level format: s/\%ld/\%d/
     }
