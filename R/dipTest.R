@@ -27,8 +27,8 @@ dip.test <- function(x, simulate.p.value = FALSE, B = 2000)
 	max.n <- max(nn <- as.integer(dn[["n"]]))
 	P.s <- as.numeric(dn[["Pr"]])
 
-        if(n > max.n) { ## extrapolate, or rather just use the last n as == "asymptotic"
-            message("n = ",n," > max_n{n in table} = ",max.n,
+        if(n >= max.n) { ## extrapolate, or rather just use the last n as == "asymptotic"
+            message("n = ",n," >= max_n{n in table} = ",max.n,
                     " -- using that as asymptotic value.")
             n1 <- n0 <- max.n
             i2 <- i.n <- length(nn)
