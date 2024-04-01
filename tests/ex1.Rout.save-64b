@@ -1,7 +1,7 @@
 
-R version 4.0.3 Patched (2020-11-18 r79442) -- "Bunny-Wunnies Freak Out"
-Copyright (C) 2020 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R Under development (unstable) (2024-03-31 r86238) -- "Unsuffered Consequences"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -141,7 +141,7 @@ List of 15
  $ full.result: logi TRUE
  - attr(*, "class")= chr "dip"
 > cat('Time elapsed: ', (.pt <- proc.time()),'\n') # "stats"
-Time elapsed:  0.184 0.023 0.252 0 0.003 
+Time elapsed:  0.393 0.057 0.449 0.004 0.01 
 > 
 > ## Real data examples :
 > 
@@ -288,11 +288,20 @@ List of 15
  $ full.result: logi TRUE
  - attr(*, "class")= chr "dip"
 > 
+> ## current qDiptab <--> n = 72'000 is "asymptotic" boundary
+> set.seed(123); x <- rnorm(72000)
+> dt72k <- dip.test(x)
+n = 72000 >= max_n{n in table} = 72000 -- using that as asymptotic value.
+> ## gave error  in qDiptab[i2, ] : subscript out of bounds  -- in diptest <= 0.77-0
+> stopifnot(all.equal(list(statistic = c(D = 0.0005171098381181), p.value = 1, nobs = 72000L),
++                     dt72k[c("statistic", "p.value", "nobs")], tolerance = 1e-13))
+> 
+> 
 > cat('Time elapsed: ', proc.time() - .pt,'\n') # "stats"
-Time elapsed:  0.034 0.005 0.052 0 0 
+Time elapsed:  0.092 0.015 0.108 0 0 
 > 
 > if(!interactive()) warnings()
 > 
 > proc.time()
    user  system elapsed 
-  0.218   0.031   0.304 
+  0.489   0.082   0.557 
