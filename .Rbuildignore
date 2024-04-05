@@ -1,4 +1,5 @@
 stuff
+^M1mac
 .*,v
 .*-ss
 tests/.*64b
