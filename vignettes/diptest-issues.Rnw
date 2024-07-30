@@ -1,5 +1,4 @@
 %\documentclass[article]{jss}
-%% -- $Id: diptest-issues.Rnw,v 1.9 2011/08/10 14:04:29 maechler Exp maechler $
 \documentclass[nojss,article]{jss}
 %              ----- for the package-vignette, don't use JSS logo, etc
 %
@@ -44,11 +43,11 @@
 %% in the following format:
 \Address{
 	Martin M\"achler\\
-	Seminar f\"ur Statistik, HG G~16\\
+	Seminar f\"ur Statistik, HG G~14.2\\
 	ETH Zurich\\
 	8092 Zurich, Switzerland\\
 	E-mail: \email{maechler@stat.math.ethz.ch}\\
-	URL: \url{http://stat.ethz.ch/people/maechler}
+	URL: \url{https://people.math.ethz.ch/~maechler/}
 }
 %% It is also possible to add a telephone and fax number
 %% before the e-mail in the following format:
@@ -141,6 +140,7 @@ if(.Platform$OS.type != "windows")
 
 ## In order to  save() and load() expensive results
 thisDir <- system.file('doc', package='diptest')
+## not yet used:
 xtraDir <- if(Sys.getenv("USER") == "maechler")
     "~/R/Pkgs/diptest/stuff" else thisDir
 res1.file <- file.path(thisDir, "aggr_results.Rdata")

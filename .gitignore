@@ -12,7 +12,7 @@ inst/doc/*.bib
 inst/doc/*.sty
 TAGS
 *~
-*,v
+*,v*
 *-ss
 vignettes/cache/*
 .Rhistory
