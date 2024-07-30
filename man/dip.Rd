@@ -73,7 +73,7 @@ dip(x, full.result = FALSE, min.is.0 = FALSE, debug = FALSE)
   Computation of the Dip Statistic to Test for Unimodality;
   \emph{Applied Statistics (JRSS C)} \bold{34}, 320--325.\cr
   Corresponding (buggy!) Fortran code of \sQuote{AS 217} available from Statlib,
-  \url{http://lib.stat.cmu.edu/apstat/217}
+  \url{https://lib.stat.cmu.edu/apstat/217}
 
   J. A. Hartigan and P. M. Hartigan (1985)
   The Dip Test of Unimodality;
