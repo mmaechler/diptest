@@ -1,13 +1,13 @@
 Package: diptest
 Version: 0.77-2
-VersionNote: Last CRAN: 0.77-1 On 2024-03-31
-Date: 2024-07-30
+VersionNote: Last CRAN: 0.77-1 on 2024-03-31
+Date: 2024-08-13
 Authors@R: c(
     person("Martin", "Maechler", role = c("aut", "cre"),
 	   email = "maechler@stat.math.ethz.ch",
 	   comment = c("Ported to R and C from Fortran and S-plus; much enhanced",
 		       ORCID = "0000-0002-8685-9910")),
-    person("Dario Ringach", role = "aut", comment("Fortran and S-plus; at NYU.edu")))
+    person("Dario Ringach", role = "aut", comment = c("Fortran and S-plus; at NYU.edu")))
 Title: Hartigan's Dip Test Statistic for Unimodality - Corrected
 Description: Compute Hartigan's dip test statistic for unimodality /
  multimodality and provide a test with simulation based p-values,  where
