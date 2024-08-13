@@ -7,7 +7,7 @@ Authors@R: c(
 	   email = "maechler@stat.math.ethz.ch",
 	   comment = c("Ported to R and C from Fortran and S-plus; much enhanced",
 		       ORCID = "0000-0002-8685-9910")),
-    person("Dario Ringach", role = "aut", comment = c("Fortran and S-plus; at NYU.edu")))
+    person("Dario Ringach", role = "aut", comment = "Fortran and S-plus; at NYU.edu"))
 Title: Hartigan's Dip Test Statistic for Unimodality - Corrected
 Description: Compute Hartigan's dip test statistic for unimodality /
  multimodality and provide a test with simulation based p-values,  where
