@@ -1,11 +1,14 @@
+## -*-sh-*-  using reg.exp (==> no initial or final '.*'),  but case is ignored!
+
 stuff
 ^M1mac
-.*,v
-.*-ss
+^TODO
+,v$
+-ss$
 tests/.*64b
 tests/.*32b
 vignettes/auto
 inst/doc/auto
-vignettes/.*\.(tex|toc|aux|log|bbl|blg|out)
-inst/doc/.*\.(tex|toc|aux|log|bbl|blg|out)
-inst/doc/jss.*
+vignettes/.*\.(tex|toc|aux|log|bbl|blg|out)$
+inst/doc/.*\.(tex|toc|aux|log|bbl|blg|out)$
+inst/doc/jss.
