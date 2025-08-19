@@ -1,6 +1,6 @@
 
-R version 4.4.0 alpha (2024-04-02 r86287)
-Copyright (C) 2024 The R Foundation for Statistical Computing
+R version 4.5.1 Patched (2025-08-11 r88580) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -69,6 +69,24 @@ dip() in C: n = 5; starting with  2N*dip = 1.
   calculating dip .. (dip_l, dip_u) = (1.33333, 0) -> new larger dip 1.33333 (j_best = 2)
 'dip': LOOP-BEGIN: 2n*D= 1.3333    [low,high] = [  3,  4]; l_lcm/gcm = ( 2, 2)
   ** (l_lcm,l_gcm) = (2,2) ==> d := 1
+> str(d2) # differences to M1mac (!)
+List of 15
+ $ call       : language dip(x = 6 - x, full.result = TRUE, debug = 2)
+ $ x          : num [1:5] 0 1 3 4 6
+ $ n          : int 5
+ $ dip        : num 0.133
+ $ lo.hi      : int [1:2] 3 4
+ $ ifault     : int 0
+ $ gcm        : int [1:2] 4 3
+ $ lcm        : int [1:2] 3 4
+ $ mn         : int [1:5] 1 1 1 3 1
+ $ mj         : int [1:5] 2 4 4 5 5
+ $ min.is.0   : logi FALSE
+ $ debug      : int 2
+ $ xl         : num 3
+ $ xu         : num 4
+ $ full.result: logi TRUE
+ - attr(*, "class")= chr "dip"
 > ## IGNORE_RDIFF_END
 > str(d1)
 List of 15
@@ -86,24 +104,6 @@ List of 15
  $ debug      : int 2
  $ xl         : num 5
  $ xu         : num 6
- $ full.result: logi TRUE
- - attr(*, "class")= chr "dip"
-> str(d2)
-List of 15
- $ call       : language dip(x = 6 - x, full.result = TRUE, debug = 2)
- $ x          : num [1:5] 0 1 3 4 6
- $ n          : int 5
- $ dip        : num 0.133
- $ lo.hi      : int [1:2] 3 4
- $ ifault     : int 0
- $ gcm        : int [1:2] 4 3
- $ lcm        : int [1:2] 3 4
- $ mn         : int [1:5] 1 1 1 3 1
- $ mj         : int [1:5] 2 4 4 5 5
- $ min.is.0   : logi FALSE
- $ debug      : int 2
- $ xl         : num 3
- $ xu         : num 4
  $ full.result: logi TRUE
  - attr(*, "class")= chr "dip"
 > 

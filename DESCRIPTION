@@ -1,7 +1,7 @@
 Package: diptest
 Version: 0.77-2
 VersionNote: Last CRAN: 0.77-1 on 2024-03-31
-Date: 2024-08-13
+Date: 2025-08-19
 Authors@R: c(
     person("Martin", "Maechler", role = c("aut", "cre"),
 	   email = "maechler@stat.math.ethz.ch",

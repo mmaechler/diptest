@@ -15,9 +15,9 @@ x <- c(0,2:3,5:6)
 ## IGNORE_RDIFF_BEGIN
 d1 <- dip(x,   full=TRUE, debug=2)
 d2 <- dip(6-x, full=TRUE, debug=2)
+str(d2) # differences to M1mac (!)
 ## IGNORE_RDIFF_END
 str(d1)
-str(d2)
 
 if(!dev.interactive(orNone=TRUE)) pdf("ex1.pdf")
 par(mfrow = 2:1, mar = .1+c(3,4,2,1), mgp=c(1.5,.6,0), oma = c(0,0,2.1,0))
